@@ -1,9 +1,13 @@
 package org.fbb.balkna.swing;
 
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -23,10 +27,11 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     static final File exportDir = new File(System.getProperty("user.home"));
     static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
-    
+
     final ImagePreviewComponent ip = new ImagePreviewComponent();
     static FlashBoulderBalkna hack;
-    
+    private final KeyEventDispatcher f1;
+
     private void selectTraining() {
         if (jList1.getSelectedValue() == null) {
             ip.setSrc(ImgUtils.getDefaultImage());
@@ -51,6 +56,29 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         SwingTranslator.load(Model.getModel().getLanguage());
         setLocales();
         reloadTrainings();
+
+        f1 = new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_F1 && e.getID()==KeyEvent.KEY_PRESSED) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            SettingsDialogue d = new SettingsDialogue((Training) jList1.getSelectedValue());
+                             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
+                            d.setVisible(true);
+                            d.dispose();
+                             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
+                        }
+                    });
+
+                    return true;
+                }
+                return false;
+            }
+        };
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
 
     }
 
@@ -78,6 +106,11 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 formComponentResized(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
 
@@ -157,6 +190,11 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         // TODO add your handling code here:
         selectTraining();
     }//GEN-LAST:event_formComponentResized
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
