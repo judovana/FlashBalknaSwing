@@ -5,6 +5,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
@@ -18,6 +20,7 @@ import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.swing.locales.SwingTranslator;
+import org.fbb.balkna.tui.TuiMain;
 
 /**
  *
@@ -25,8 +28,8 @@ import org.fbb.balkna.swing.locales.SwingTranslator;
  */
 public class FlashBoulderBalkna extends javax.swing.JFrame {
 
-    static final File exportDir = new File(System.getProperty("user.home"));
-    static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
+    public static final File exportDir = new File(System.getProperty("user.home"));
+    public static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
 
     final ImagePreviewComponent ip = new ImagePreviewComponent();
     static FlashBoulderBalkna hack;
@@ -60,16 +63,16 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         f1 = new KeyEventDispatcher() {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_F1 && e.getID()==KeyEvent.KEY_PRESSED) {
+                if (e.getKeyCode() == KeyEvent.VK_F1 && e.getID() == KeyEvent.KEY_PRESSED) {
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
                             SettingsDialogue d = new SettingsDialogue((Training) jList1.getSelectedValue());
-                             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
+                            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
                             d.setVisible(true);
                             d.dispose();
-                             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
+                            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
                         }
                     });
 
@@ -199,40 +202,47 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
+    public static void main(String args[]) throws IOException {
+        final boolean[] tui = new boolean[]{args.length > 0};
         try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
+            if (!tui[0]) {
+                try {
+                    for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                        if ("Nimbus".equals(info.getName())) {
+                            javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                            break;
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
+                //</editor-fold>
+
+                /* Create and display the form */
+                java.awt.EventQueue.invokeAndWait(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            new FlashBoulderBalkna().setVisible(true);
+                        } catch (Exception ex) {
+                            System.err.println(SwingTranslator.R("NoGui"));
+                            tui[0] = true;
+                        }
+                    }
+                });
             }
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (InstantiationException ex) {
-            ex.printStackTrace();
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            ex.printStackTrace();
+        } catch (InterruptedException ex) {
+            System.err.println(SwingTranslator.R("NoGui"));
+            tui[0] = true;
+        } catch (InvocationTargetException ex) {
+            System.err.println(SwingTranslator.R("NoGui"));
+            tui[0] = true;
         }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new FlashBoulderBalkna().setVisible(true);
-            }
-        });
+        if (tui[0]){
+            TuiMain.main(args);
+            
+        }
     }
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonsPanel;
     private javax.swing.JPanel imgPreview;

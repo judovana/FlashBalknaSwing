@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFrame;
@@ -17,7 +18,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
@@ -32,6 +32,7 @@ import org.fbb.balkna.swing.locales.SwingTranslator;
  * @author jvanek
  */
 public class TraningWindow extends javax.swing.JDialog {
+
     static TraningWindow hack;
 
     private final MainTimer model;
@@ -40,11 +41,11 @@ public class TraningWindow extends javax.swing.JDialog {
     Runnable oneTenthOfSecondListener;
     Runnable secondListener;
     private final Training src;
-    
+
     TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src) {
         super(parent, src.getName(), modal);
-        TraningWindow.hack=this;
-        this.src=src;
+        TraningWindow.hack = this;
+        this.src = src;
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
 
@@ -57,7 +58,7 @@ public class TraningWindow extends javax.swing.JDialog {
         });
         this.model = mainTimer;
         initComponents();
-        
+
         jList1.setModel(new ListModel<BasicTime>() {
 
             @Override
@@ -106,17 +107,10 @@ public class TraningWindow extends javax.swing.JDialog {
                     nowNextLAbel.setText("");
 
                 } else {
+                    time.play();
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
                     if (time instanceof PausaTime) {
                         ((BgLabel) timer).cross(true);
-                        if (Model.getModel().isLaud()) {
-                            if (time instanceof BigRestTime) {
-                                SoundProvider.getInstance().getPSendChange().playAsync();
-                            } else {
-                                SoundProvider.getInstance().getPSendRun().playAsync();
-                            }
-
-                        }
                         nowNextLAbel.setText(model.next());
                         BasicTime ntime = model.getNext();
                         Exercise t = ntime.getOriginator().getOriginal();
@@ -140,9 +134,6 @@ public class TraningWindow extends javax.swing.JDialog {
 
                     } else {
                         ((BgLabel) timer).cross(false);
-                        if (Model.getModel().isLaud()) {
-                            SoundProvider.getInstance().getPSstart().playAsync();
-                        }
                         nowNextLAbel.setText(model.now());
                         Exercise t = time.getOriginator().getOriginal();
                         List<BufferedImage> l = ImgUtils.getExerciseImages(t, ip.getWidth(), ip.getHeight());
@@ -184,7 +175,7 @@ public class TraningWindow extends javax.swing.JDialog {
             @Override
             public void run() {
                 BasicTime c = model.getCurrent();
-                soundLogicRuntime(c);
+                c.soundLogicRuntime();
                 final String s = TimeUtils.secondsToHours(c.getCurrentValue() + model.getFutureTime()) + "/" + TimeUtils.secondsToHours(model.getTotalTime());
                 //System.out.println(s);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -197,30 +188,6 @@ public class TraningWindow extends javax.swing.JDialog {
 
             }
 
-            private void soundLogicRuntime(BasicTime c) {
-                if (!Model.getModel().isLaud()) {
-                    return;
-                }
-                if (c.getCurrentValue() - 2 == 0) {
-                    SoundProvider.getInstance().getPSthree().playAsync();
-                } else if (c.getCurrentValue() - 1 == 0) {
-                    SoundProvider.getInstance().getPStwo().playAsync();
-                } else if (c.getCurrentValue() == 0) {
-                    SoundProvider.getInstance().getPSone().playAsync();
-                } else if (c.getCurrentValue() == c.getOriginalValue() / 2) {
-                    if (c instanceof PausaTime) {
-                        SoundProvider.getInstance().getPShalfPause().playAsync();
-                    } else {
-                        SoundProvider.getInstance().getPShalfRun().playAsync();
-                    }
-                } else if (c.getCurrentValue() == (c.getOriginalValue()) / 4) {
-                    if (c instanceof PausaTime) {
-                        SoundProvider.getInstance().getPSthreeQatsPause().playAsync();
-                    } else {
-                        SoundProvider.getInstance().getPSthreeQuatsRun().playAsync();
-                    }
-                }
-            }
         };
         model.setSecondListener(secondListener);
         runAllListeners();
@@ -460,14 +427,14 @@ public class TraningWindow extends javax.swing.JDialog {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
-        hack=null;
-       
+        hack = null;
+
     }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
 
         FlashBoulderBalkna.main(args);
 
