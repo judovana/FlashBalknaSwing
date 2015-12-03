@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
@@ -34,6 +35,7 @@ public class Commander {
     }
 
     private static void printInfo(List<Training> l) {
+        System.out.println(SwingTranslator.R("TuiMainCommands20"));
         System.out.println(SwingTranslator.R("TuiMainCommands10"));
         System.out.println(SwingTranslator.R("TuiMainCommands9"));
         System.out.println(SwingTranslator.R("TuiMainCommands8", configDir));
@@ -58,15 +60,20 @@ public class Commander {
         }
         if (s.toLowerCase().startsWith("info ")) {
             int i = getIdFromCommand(s);
-            List<BufferedImage> imgs = ImgUtils.getTrainingImages(l.get(i), ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
-            int index = 0;
-            if (imgs.size() > 1) {
-                index = 1;
+            if (TuiMain.globalImages) {
+                List<BufferedImage> imgs = ImgUtils.getTrainingImages(l.get(i), ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
+                int index = 0;
+                if (imgs.size() > 1) {
+                    index = 1;
+                }
+                ConsoleImageViewer.doJob(imgs.get(index));
             }
-            ConsoleImageViewer.doJob(imgs.get(index));
             System.out.println(l.get(i).getStory());
         }
         if (s.toLowerCase().startsWith("images ")) {
+            if (!TuiMain.globalImages) {
+                System.out.println(SwingTranslator.R("TuiImagesDissabled"));
+            }
             int i = getIdFromCommand(s);
             List<BufferedImage> imgs = ImgUtils.getTrainingImages(l.get(i), ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
             int index = 0;
@@ -111,7 +118,9 @@ public class Commander {
                 value = null;
             }
             Settings.getSettings().readItem(key, value);
-            SoundProvider.getInstance().load(Settings.getSettings().getForcedSoundFont());
+            if (TuiMain.globalSounds) {
+                SoundProvider.getInstance().load(Settings.getSettings().getForcedSoundFont());
+            }
             Translator.load(Settings.getSettings().getForcedLanguage());
             SwingTranslator.load(Settings.getSettings().getForcedLanguage());
             System.out.println("OK");
@@ -125,8 +134,31 @@ public class Commander {
             System.out.println("");
 
         }
+        if (s.toLowerCase().startsWith("sound")) {
+            System.out.println(SwingTranslator.R("TuiSoundInfo1"));
+            String[] ls = Packages.SOUND_PACKS;
+            for (String l1 : ls) {
+                System.out.println("  " + l1);
+            }
+            if (!TuiMain.globalSounds) {
+                System.out.println(SwingTranslator.R("TuiSoundDissabled"));
+            }
+            String[] isPack = s.split("\\s+");
+            if (isPack.length == 1) {
+                System.out.println(SwingTranslator.R("TuiSoundInfo2", SoundProvider.getInstance().getUsedSoundPack()));
+                SoundProvider.getInstance().test();
+            } else {
+                System.out.println(SwingTranslator.R("TuiSoundInfo2", isPack[1]));
+                SoundProvider.getInstance().test(isPack[1]);
+
+            }
+
+        }
         if (s.toLowerCase().startsWith("export ")) {
             int i = getIdFromCommand(s);
+            if (!TuiMain.globalImages) {
+                System.out.println(SwingTranslator.R("TuiImagesDissabled"));
+            }
             File f = l.get(i).export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
             System.out.println("Exported: " + f.getAbsolutePath());
             System.out.println("");
@@ -136,7 +168,7 @@ public class Commander {
         if (s.toLowerCase().startsWith("train ")) {
             int i = getIdFromCommand(s);
             String[] isShift = s.split("\\s+");
-            if (isShift.length>3){
+            if (isShift.length > 3) {
                 Model.getModel().getTimeShift().setTraining(new Double(isShift[2].trim()));
                 Model.getModel().getTimeShift().setPause(new Double(isShift[3].trim()));
                 Model.getModel().getTimeShift().setRest(new Double(isShift[4].trim()));

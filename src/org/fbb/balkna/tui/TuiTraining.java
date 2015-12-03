@@ -41,16 +41,24 @@ class TuiTraining {
             public void run() {
                 BasicTime time = model.getCurrent();
                 if (model.isEnded()) {
-                    ConsoleImageViewer.doJob(ImgUtils.getDefaultImage());
+                    if (TuiMain.globalImages) {
+                        ConsoleImageViewer.doJob(ImgUtils.getDefaultImage());
+                    }
                     System.out.println(time.getEndMssage());
+                    System.exit(0);
 
                 } else {
+                    if (TuiMain.globalSounds){
                     time.play();
+                    }
                     if (time instanceof PausaTime) {
                         BasicTime ntime = model.getNext();
                         Exercise t = ntime.getOriginator().getOriginal();
-                        List<BufferedImage> l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
-                        ConsoleImageViewer.doJob(l.get(0));
+                        List l = null;
+                        if (TuiMain.globalImages) {
+                            l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
+                            ConsoleImageViewer.doJob((BufferedImage) l.get(0));
+                        }
                         bigInfo1(time);
                         System.out.println(model.next());
                         System.out.println(t.getDescription());
@@ -67,8 +75,11 @@ class TuiTraining {
 
                     } else {
                         Exercise t = time.getOriginator().getOriginal();
-                        List<BufferedImage> l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
-                        ConsoleImageViewer.doJob(l.get(0));
+
+                        if (TuiMain.globalImages) {
+                            List l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
+                            ConsoleImageViewer.doJob((BufferedImage) l.get(0));
+                        }
                         bigInfo2();
                         System.out.println(t.getDescription());
                         System.out.println(model.now() + " " + t.getName());
@@ -98,7 +109,9 @@ class TuiTraining {
             @Override
             public void run() {
                 BasicTime c = model.getCurrent();
-                c.soundLogicRuntime();
+                if (TuiMain.globalSounds) {
+                    c.soundLogicRuntime();
+                }
                 final String s = TimeUtils.secondsToMinutes(model.getCurrent().getCurrentValue()) + ":" + model.getTenthOfSecond();
                 System.out.println(s);
 
@@ -124,7 +137,8 @@ class TuiTraining {
 
     }
 
-    private void waitForEnter(List<BufferedImage> l) {
+    //intentionlaly  not generic to avoid failue on systems without buffered image class
+    private void waitForEnter(List l) {
         model.stop();
         System.out.println(SwingTranslator.R("TuiPause"));
         int i = 0;
@@ -132,31 +146,36 @@ class TuiTraining {
             try {
                 String s = br.readLine().trim();
                 s = s.toLowerCase();
+
+                if (s.startsWith("s")) {
+                    skip();
+                    skip();
+                    break;
+                }
+                if (s.startsWith("b")) { //hm not working:(
+                    back();
+                    back();
+                    back();
+                    break;
+                }
+
                 if (s.startsWith("p")) {
                     i--;
                     if (i < 0) {
                         i = 0;
                     }
                 }
-                if (s.startsWith("n")) {
-                    i++;
-                    if (i >= l.size()) {
-                        i = l.size() - 1;
+                if (l != null && !l.isEmpty()) {
+                    if (s.startsWith("n")) {
+                        i++;
+                        if (i >= l.size()) {
+                            i = l.size() - 1;
+                        }
                     }
-                }
-                if (s.startsWith("s")) {
-                    skip();
-                    skip();
-                    break;
-                }
-                if (s.startsWith("b")) {
-                    back();
-                    back();
-                    back();
-                    break;
-                }
-                if (s.startsWith("n") || s.startsWith("p")) {
-                    ConsoleImageViewer.doJob(l.get(i));
+
+                    if (s.startsWith("n") || s.startsWith("p")) {
+                        ConsoleImageViewer.doJob((BufferedImage) l.get(i));
+                    }
                 }
                 if (s.isEmpty()) {
                     break;
