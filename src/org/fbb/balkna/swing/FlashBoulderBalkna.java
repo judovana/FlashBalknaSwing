@@ -1,5 +1,6 @@
 package org.fbb.balkna.swing;
 
+import org.fbb.balkna.model.utils.JavaPluginProvider;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.KeyEvent;
@@ -53,7 +54,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     }
 
     public FlashBoulderBalkna() {
-        Model.createrModel(configDir, new JavaxWawPlayerProvider());
+        Model.createrModel(configDir, new JavaxWawPlayerProvider(), new JavaPluginProvider());
         hack = this;
         initComponents();
         SwingTranslator.load(Model.getModel().getLanguage());

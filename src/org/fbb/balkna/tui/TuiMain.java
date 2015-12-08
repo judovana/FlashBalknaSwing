@@ -10,6 +10,7 @@ import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.Settings;
 import org.fbb.balkna.model.primitives.Training;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
+import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.judovana.linux.ConsoleImageViewer;
 import static org.judovana.linux.ConsoleImageViewer.haveParam;
@@ -41,7 +42,7 @@ public class TuiMain {
             args = new String[]{"-best"};
         }
         ConsoleImageViewer.setParams(args);
-        Model.createrModel(configDir, new JavaxWawPlayerProvider());
+        Model.createrModel(configDir, new JavaxWawPlayerProvider(), new JavaPluginProvider());
         if (globalImages) {
             ConsoleImageViewer.doJob(ImgUtils.getDefaultImage());
         }

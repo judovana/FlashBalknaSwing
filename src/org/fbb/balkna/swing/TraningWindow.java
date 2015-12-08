@@ -88,7 +88,7 @@ public class TraningWindow extends javax.swing.JDialog {
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 BasicTime b = (BasicTime) value;
-                label.setText(b.getHtmlPreview1());
+                label.setText(b.getHtmlPreview1(true));
                 return label;
             }
         });
@@ -105,6 +105,10 @@ public class TraningWindow extends javax.swing.JDialog {
                     pauseRestInfoLabel.setText(time.getEndMssage());
                     ip.resetSrcs();
                     nowNextLAbel.setText("");
+                     if (((BgLabel) timer).getImgs() != null) {
+                            ((BgLabel) timer).setSrcs(ip.getSrcs());
+                            ((BgLabel) timer).setSelcted(ip.getSelcted());
+                        }
 
                 } else {
                     time.play();
