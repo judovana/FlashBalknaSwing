@@ -9,6 +9,7 @@ import org.fbb.balkna.javax.JavaxWawPlayerProvider;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.Settings;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.utils.JavaPluginProvider;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.judovana.linux.ConsoleImageViewer;

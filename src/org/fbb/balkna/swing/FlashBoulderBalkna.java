@@ -19,6 +19,7 @@ import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.fbb.balkna.tui.TuiMain;
 
