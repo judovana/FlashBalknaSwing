@@ -57,7 +57,6 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         Model.createrModel(configDir, new JavaxWawPlayerProvider());
         hack = this;
         initComponents();
-        SwingTranslator.load(Model.getModel().getLanguage());
         setLocales();
         reloadTrainings();
 

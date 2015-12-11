@@ -184,7 +184,7 @@ public class SettingsDialogue extends JDialog {
         languageLabel.setText("Language");
         this.getContentPane().add(languageLabel);
 
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(new String[]{" ", "cs", "en"}));
+        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(Packages.LANGUAGES));
         this.getContentPane().add(jComboBox2);
 
         changeLanguageButton.setText("Change trainings language");
