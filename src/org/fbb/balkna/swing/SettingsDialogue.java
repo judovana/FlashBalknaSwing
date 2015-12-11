@@ -377,10 +377,8 @@ public class SettingsDialogue extends JDialog {
                 public void actionPerformed(ActionEvent e) {
                     if (l.getSelectedValue() != null) {
                         File f = (File) l.getSelectedValue();
-                        f.delete();
                         JavaPluginProvider.getPluginPaths().removePath(f);
                         d.dispose();
-                        Model.getModel().reload();
                         FlashBoulderBalkna.hack.reloadTrainings();
                     }
                 }
