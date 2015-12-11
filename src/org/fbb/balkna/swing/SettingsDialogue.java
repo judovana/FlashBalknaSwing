@@ -27,6 +27,7 @@ import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 
 /**
@@ -377,7 +378,10 @@ public class SettingsDialogue extends JDialog {
                     if (l.getSelectedValue() != null) {
                         File f = (File) l.getSelectedValue();
                         f.delete();
+                        JavaPluginProvider.getPluginPaths().removePath(f);
                         d.dispose();
+                        Model.getModel().reload();
+                        FlashBoulderBalkna.hack.reloadTrainings();
                     }
                 }
             });

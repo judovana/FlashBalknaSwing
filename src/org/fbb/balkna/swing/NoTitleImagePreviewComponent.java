@@ -22,6 +22,7 @@ class NoTitleImagePreviewComponent extends ImagePreviewComponent {
 
     }
 
+    @Override
     protected void adjsutSelectedTo1() {
         selcted = 0;
         repaint();
