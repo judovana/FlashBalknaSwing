@@ -25,6 +25,7 @@ import javax.swing.event.ChangeListener;
 import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.model.Model;
+import org.fbb.balkna.model.Settings;
 import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
@@ -56,6 +57,8 @@ public class SettingsDialogue extends JDialog {
     private javax.swing.JCheckBox mute;
     private javax.swing.JCheckBox pauseOnChange;
     private javax.swing.JCheckBox pauseOnExercise;
+    private javax.swing.JCheckBox alowScreenChange;
+    private javax.swing.JCheckBox invertScreenLayout;
     private javax.swing.JLabel pausesModLabel;
     private javax.swing.JSpinner pausesSpinner;
     private javax.swing.JCheckBox ratioCheckbox;
@@ -138,6 +141,8 @@ public class SettingsDialogue extends JDialog {
         pauseOnChange.setSelected(Model.getModel().isPauseOnChange());
         pauseOnExercise.setSelected(Model.getModel().isPauseOnExercise());
         mute.setSelected(!Model.getModel().isLaud());
+        invertScreenLayout.setSelected(Settings.getSettings().isInvertScreenCompress());
+        alowScreenChange.setSelected(Settings.getSettings().isAllowScreenChange());
         ratioCheckbox.setSelected(Model.getModel().isRatioForced());
         this.pack();
 
@@ -159,6 +164,21 @@ public class SettingsDialogue extends JDialog {
             }
         });
         this.getContentPane().add(mute);
+        
+        invertScreenLayout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Settings.getSettings().setInvertScreenCompress(invertScreenLayout.isSelected());
+            }
+        });
+        this.getContentPane().add(invertScreenLayout);
+        
+        alowScreenChange.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Settings.getSettings().setAllowScreenChange(alowScreenChange.isSelected());
+            }
+        });
+        this.getContentPane().add(alowScreenChange);
+        
 
         soundPackLabel.setText("Soundpack:");
         this.getContentPane().add(soundPackLabel);
@@ -417,6 +437,8 @@ public class SettingsDialogue extends JDialog {
         pausesModLabel.setText("  - " + SwingTranslator.R("PauseTimesModifier"));
         restsModLabel.setText("  - " + SwingTranslator.R("RestTimesModifier"));
         saveForOfline.setText(SwingTranslator.R("SaveForOfline"));
+        alowScreenChange.setText(SwingTranslator.R("alowScreenChange"));
+        invertScreenLayout.setText(SwingTranslator.R("invertScreenLayout"));
 
     }
 
@@ -435,6 +457,8 @@ public class SettingsDialogue extends JDialog {
         tutorialLabel = new javax.swing.JLabel();
         pauseOnExercise = new javax.swing.JCheckBox();
         pauseOnChange = new javax.swing.JCheckBox();
+        alowScreenChange = new javax.swing.JCheckBox();
+        invertScreenLayout = new javax.swing.JCheckBox();
         cheaterLabel = new javax.swing.JLabel();
         allowSkipping = new javax.swing.JCheckBox();
         creditsLabel = new javax.swing.JLabel();

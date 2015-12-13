@@ -1,6 +1,8 @@
 package org.fbb.balkna.swing;
 
 import java.awt.Component;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +20,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
+import org.fbb.balkna.model.Settings;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
@@ -105,10 +108,10 @@ public class TraningWindow extends javax.swing.JDialog {
                     pauseRestInfoLabel.setText(time.getEndMssage());
                     ip.resetSrcs();
                     nowNextLAbel.setText("");
-                     if (((BgLabel) timer).getImgs() != null) {
-                            ((BgLabel) timer).setSrcs(ip.getSrcs());
-                            ((BgLabel) timer).setSelcted(ip.getSelcted());
-                        }
+                    if (((BgLabel) timer).getImgs() != null) {
+                        ((BgLabel) timer).setSrcs(ip.getSrcs());
+                        ((BgLabel) timer).setSelcted(ip.getSelcted());
+                    }
 
                 } else {
                     time.play();
@@ -199,6 +202,9 @@ public class TraningWindow extends javax.swing.JDialog {
 
             @Override
             public void mouseClicked(MouseEvent evt) {
+                if (!Settings.getSettings().isAllowScreenChange()) {
+                    return;
+                }
                 if (evt.getButton() == MouseEvent.BUTTON3) {
                     ((BgLabel) timer).setSrcs(ip.getSrcs());
                     ((BgLabel) timer).setSelcted(ip.getSelcted());
@@ -206,6 +212,22 @@ public class TraningWindow extends javax.swing.JDialog {
             }
 
         });
+
+        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        long w = gd.getDisplayMode().getWidth();
+        long h = gd.getDisplayMode().getHeight();
+
+        if ((w * h < 800l * 600l && !Settings.getSettings().isInvertScreenCompress())
+                || (w * h >= 800l * 600l && Settings.getSettings().isInvertScreenCompress())) {
+            jPanel2.setVisible(false);
+            imgAndDescription.setVisible(false);
+            mainPanel.remove(imgAndDescription);
+            mainPanel.setLayout(new GridLayout());
+            if (((BgLabel) timer).getImgs() != null) {
+                ((BgLabel) timer).setSrcs(ip.getSrcs());
+                ((BgLabel) timer).setSelcted(ip.getSelcted());
+            }
+        }
         setLocales();
 
     }
@@ -371,12 +393,16 @@ public class TraningWindow extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jList1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jList1MouseClicked
-        // TODO add your handling code here:
+        if (!Settings.getSettings().isAllowScreenChange()) {
+            return;
+        }
         jPanel2.setVisible(false);
     }//GEN-LAST:event_jList1MouseClicked
 
     private void timerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_timerMouseClicked
-        // TODO add your handling code here:
+        if (!Settings.getSettings().isAllowScreenChange()) {
+            return;
+        }
         imgAndDescription.setVisible(true);
         mainPanel.add(imgAndDescription);
         if (evt.getClickCount() > 1) {
@@ -422,7 +448,9 @@ public class TraningWindow extends javax.swing.JDialog {
     }//GEN-LAST:event_backButtonActionPerformed
 
     private void jTextArea1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextArea1MouseClicked
-        // TODO add your handling code here:
+        if (!Settings.getSettings().isAllowScreenChange()) {
+            return;
+        }
         imgAndDescription.setVisible(false);
         mainPanel.remove(imgAndDescription);
         mainPanel.setLayout(new GridLayout());
