@@ -20,7 +20,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.Settings;
+import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;

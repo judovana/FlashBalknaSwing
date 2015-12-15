@@ -5,19 +5,28 @@
  */
 package org.fbb.balkna.swing;
 
+import java.awt.BorderLayout;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
@@ -25,7 +34,7 @@ import javax.swing.event.ChangeListener;
 import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.Settings;
+import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
@@ -43,6 +52,7 @@ public class SettingsDialogue extends JDialog {
     private javax.swing.JButton changeLanguageButton;
     private javax.swing.JLabel cheaterLabel;
     private javax.swing.JButton closeButton;
+    private javax.swing.JButton resetButton;
     private javax.swing.JLabel creditsLabel;
     private javax.swing.JButton downloadButton;
     private javax.swing.JLabel exercisesModLabel;
@@ -71,6 +81,25 @@ public class SettingsDialogue extends JDialog {
     private javax.swing.JLabel trainingsModLabel;
     private javax.swing.JSpinner trainingsSpinner;
     private javax.swing.JLabel tutorialLabel;
+
+    private javax.swing.JTabbedPane bothPannels;
+    private javax.swing.JPanel settings;
+    private javax.swing.JPanel appearence;
+
+    private JLabel colorsInfo;
+    private JLabel trainingDelimiterSizeLabel;
+    private JSpinner trainingDelimiterSize;
+    private JLabel trainingDelimiterColorLabel;
+    private JLabel trainingDelimiterColor;
+    private JLabel selectedItemColorLabel;
+    private JLabel selectedItemColor;
+    private JLabel mainTimerSizeLabel;
+    private JSpinner mainTimerSize;
+    private JLabel mainTimerColorLabel;
+    private JLabel mainTimerColor;
+    private JLabel mainTimerPositionLabel;
+    private JComboBox mainTimerPosition;
+
     private final Training src;
 
     public SettingsDialogue(final Training src) {
@@ -148,14 +177,27 @@ public class SettingsDialogue extends JDialog {
 
     }
 
-    public final  void init() {
+    public final void init() {
         consts();
-        this.getContentPane().setLayout(new java.awt.GridLayout(0, 1));
-        this.getContentPane().add(ratioCheckbox);
+
+        settings.setLayout(new java.awt.GridLayout(0, 1));
+        appearence.setLayout(new java.awt.GridLayout(0, 1));
+
+        bothPannels.add(settings);
+        bothPannels.add(appearence);
+
+        this.getContentPane().setLayout(new BorderLayout());
+        this.getContentPane().add(bothPannels, BorderLayout.CENTER);
+
+        JPanel sharedButtons = new JPanel();
+        sharedButtons.setLayout(new java.awt.GridLayout(0, 1));
+        this.getContentPane().add(sharedButtons, BorderLayout.SOUTH);
+
+        appearence.add(ratioCheckbox);
 
         autoIterateLabel.setText("autoiterate images on timer with speed (s): (0 disabled)");
-        this.getContentPane().add(autoIterateLabel);
-        this.getContentPane().add(auitoiterateSpinner);
+        appearence.add(autoIterateLabel);
+        appearence.add(auitoiterateSpinner);
 
         mute.setText("mute");
         mute.addActionListener(new java.awt.event.ActionListener() {
@@ -163,27 +205,26 @@ public class SettingsDialogue extends JDialog {
                 muteActionPerformed(evt);
             }
         });
-        this.getContentPane().add(mute);
-        
+        settings.add(mute);
+
         invertScreenLayout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Settings.getSettings().setInvertScreenCompress(invertScreenLayout.isSelected());
             }
         });
-        this.getContentPane().add(invertScreenLayout);
-        
+        appearence.add(invertScreenLayout);
+
         alowScreenChange.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 Settings.getSettings().setAllowScreenChange(alowScreenChange.isSelected());
             }
         });
-        this.getContentPane().add(alowScreenChange);
-        
+        appearence.add(alowScreenChange);
 
         soundPackLabel.setText("Soundpack:");
-        this.getContentPane().add(soundPackLabel);
+        settings.add(soundPackLabel);
 
-        this.getContentPane().add(jComboBox1);
+        settings.add(jComboBox1);
 
         testSoundsButton.setText("Test");
         testSoundsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -191,7 +232,7 @@ public class SettingsDialogue extends JDialog {
                 testSoundsButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(testSoundsButton);
+        settings.add(testSoundsButton);
 
         setSoundPackButton.setText("Set soundpack");
         setSoundPackButton.addActionListener(new java.awt.event.ActionListener() {
@@ -199,13 +240,13 @@ public class SettingsDialogue extends JDialog {
                 setSoundPackButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(setSoundPackButton);
+        settings.add(setSoundPackButton);
 
         languageLabel.setText("Language");
-        this.getContentPane().add(languageLabel);
+        appearence.add(languageLabel);
 
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(Packages.LANGUAGES));
-        this.getContentPane().add(jComboBox2);
+        appearence.add(jComboBox2);
 
         changeLanguageButton.setText("Change trainings language");
         changeLanguageButton.addActionListener(new java.awt.event.ActionListener() {
@@ -213,10 +254,10 @@ public class SettingsDialogue extends JDialog {
                 changeLanguageButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(changeLanguageButton);
+        appearence.add(changeLanguageButton);
 
         tutorialLabel.setText("--  Tutorial mode settings --");
-        this.getContentPane().add(tutorialLabel);
+        settings.add(tutorialLabel);
 
         pauseOnExercise.setText("pause on each new exercise");
         pauseOnExercise.addActionListener(new java.awt.event.ActionListener() {
@@ -224,7 +265,7 @@ public class SettingsDialogue extends JDialog {
                 pauseOnExerciseActionPerformed(evt);
             }
         });
-        this.getContentPane().add(pauseOnExercise);
+        settings.add(pauseOnExercise);
 
         pauseOnChange.setText("pause on each new serie");
         pauseOnChange.addActionListener(new java.awt.event.ActionListener() {
@@ -232,10 +273,10 @@ public class SettingsDialogue extends JDialog {
                 pauseOnChangeActionPerformed(evt);
             }
         });
-        this.getContentPane().add(pauseOnChange);
+        settings.add(pauseOnChange);
 
         cheaterLabel.setText("-- Cheater settings --");
-        this.getContentPane().add(cheaterLabel);
+        settings.add(cheaterLabel);
 
         allowSkipping.setText("allow skipping");
         allowSkipping.addActionListener(new java.awt.event.ActionListener() {
@@ -243,10 +284,26 @@ public class SettingsDialogue extends JDialog {
                 allowSkippingActionPerformed(evt);
             }
         });
-        this.getContentPane().add(allowSkipping);
+        settings.add(allowSkipping);
 
         creditsLabel.setText("-- app by judovana --");
-        this.getContentPane().add(creditsLabel);
+        sharedButtons.add(creditsLabel);
+        creditsLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (Desktop.isDesktopSupported()) {
+                    try{
+                    Desktop.getDesktop().browse(new URI("http://flashbb.cz/aktualne"));
+                    }catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+            }
+            
+            
+});
+        
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -254,7 +311,15 @@ public class SettingsDialogue extends JDialog {
                 closeButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(closeButton);
+        sharedButtons.add(closeButton, BorderLayout.SOUTH);
+
+        resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+        sharedButtons.add(resetButton, BorderLayout.SOUTH);
 
         exportButton.setText("Export current training to Html");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -262,7 +327,7 @@ public class SettingsDialogue extends JDialog {
                 exportButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(exportButton);
+        settings.add(exportButton);
 
         downloadButton.setText("Download following jar as trainings");
         downloadButton.addActionListener(new java.awt.event.ActionListener() {
@@ -270,14 +335,14 @@ public class SettingsDialogue extends JDialog {
                 downloadButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(downloadButton);
+        settings.add(downloadButton);
 
         jTextField1.setText("file://");
-        this.getContentPane().add(jTextField1);
+        settings.add(jTextField1);
 
         saveForOfline.setSelected(true);
         saveForOfline.setText("save for offline usage");
-        this.getContentPane().add(saveForOfline);
+        settings.add(saveForOfline);
 
         managePluginsButton.setText("Manage plugins");
         managePluginsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -285,30 +350,51 @@ public class SettingsDialogue extends JDialog {
                 managePluginsButtonActionPerformed(evt);
             }
         });
-        this.getContentPane().add(managePluginsButton);
+        settings.add(managePluginsButton);
 
         exercisesModLabel.setText("Exercise modifiers:");
-        this.getContentPane().add(exercisesModLabel);
+        settings.add(exercisesModLabel);
 
         trainingsModLabel.setText("  - Training times modifier:");
-        this.getContentPane().add(trainingsModLabel);
-        this.getContentPane().add(trainingsSpinner);
+        settings.add(trainingsModLabel);
+        settings.add(trainingsSpinner);
 
         pausesModLabel.setText("  - Pause times modifier:");
-        this.getContentPane().add(pausesModLabel);
-        this.getContentPane().add(pausesSpinner);
+        settings.add(pausesModLabel);
+        settings.add(pausesSpinner);
 
         restsModLabel.setText("  - Rest times modifier:");
-        this.getContentPane().add(restsModLabel);
-        this.getContentPane().add(restsSpinner);
+        settings.add(restsModLabel);
+        settings.add(restsSpinner);
 
         iterationsModLabel.setText("  - Iterations modifier");
-        this.getContentPane().add(iterationsModLabel);
-        this.getContentPane().add(iterationsSpinner);
+        settings.add(iterationsModLabel);
+        settings.add(iterationsSpinner);
+        
+        
+        
+        appearence.add(colorsInfo);
+        appearence.add(trainingDelimiterSizeLabel);
+        appearence.add(trainingDelimiterSize);
+        appearence.add(trainingDelimiterColorLabel);
+        appearence.add(trainingDelimiterColor);
+        appearence.add(selectedItemColorLabel);
+        appearence.add(selectedItemColor);
+        appearence.add(mainTimerSizeLabel);
+        appearence.add(mainTimerSize);
+        appearence.add(mainTimerColorLabel);
+        appearence.add(mainTimerColor);
+        appearence.add(mainTimerPositionLabel);
+        appearence.add(mainTimerPosition);
     }
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().save();
+        this.setVisible(false);
+    }
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        Model.getModel().resetDefaults();
         this.setVisible(false);
     }
 
@@ -428,6 +514,7 @@ public class SettingsDialogue extends JDialog {
         allowSkipping.setText(SwingTranslator.R("Skipping"));
         creditsLabel.setText(SwingTranslator.R("Credits"));
         closeButton.setText(SwingTranslator.R("Close"));
+        closeButton.setFont(closeButton.getFont().deriveFont(Font.BOLD));
         exportButton.setText(SwingTranslator.R("Export"));
         downloadButton.setText(SwingTranslator.R("Upload"));
         managePluginsButton.setText(SwingTranslator.R("ManagePlugins"));
@@ -440,9 +527,29 @@ public class SettingsDialogue extends JDialog {
         alowScreenChange.setText(SwingTranslator.R("alowScreenChange"));
         invertScreenLayout.setText(SwingTranslator.R("invertScreenLayout"));
 
+        bothPannels.setTitleAt(0, SwingTranslator.R("settingsTab"));
+        bothPannels.setTitleAt(1, SwingTranslator.R("appearenceTab"));
+
+        colorsInfo.setText(SwingTranslator.R("colorsInfo"));
+        trainingDelimiterSizeLabel.setText(SwingTranslator.R("trainingDelimiterSizeLabel"));
+        trainingDelimiterColorLabel.setText(SwingTranslator.R("trainingDelimiterColorLabel"));
+        trainingDelimiterColor.setText("                  ");
+        selectedItemColorLabel.setText(SwingTranslator.R("selectedItemColorLabel"));
+        selectedItemColor.setText("               ");
+        mainTimerSizeLabel.setText(SwingTranslator.R("mainTimerSizeLabel"));
+        mainTimerColorLabel.setText(SwingTranslator.R("mainTimerColorLabel"));
+        mainTimerColor.setText("             ");
+        mainTimerPositionLabel.setText(SwingTranslator.R("mainTimerPositionLabel"));
+
+        
+        pack();
     }
 
     private void consts() {
+
+        closeButton = new javax.swing.JButton();
+        resetButton = new javax.swing.JButton();
+
         ratioCheckbox = new javax.swing.JCheckBox();
         autoIterateLabel = new javax.swing.JLabel();
         auitoiterateSpinner = new javax.swing.JSpinner();
@@ -462,7 +569,6 @@ public class SettingsDialogue extends JDialog {
         cheaterLabel = new javax.swing.JLabel();
         allowSkipping = new javax.swing.JCheckBox();
         creditsLabel = new javax.swing.JLabel();
-        closeButton = new javax.swing.JButton();
         exportButton = new javax.swing.JButton();
         downloadButton = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
@@ -477,5 +583,25 @@ public class SettingsDialogue extends JDialog {
         restsSpinner = new javax.swing.JSpinner();
         iterationsModLabel = new javax.swing.JLabel();
         iterationsSpinner = new javax.swing.JSpinner();
+
+        bothPannels = new JTabbedPane();
+
+        settings = new JPanel();
+        appearence = new JPanel();
+
+        colorsInfo = new JLabel();
+        trainingDelimiterSizeLabel = new JLabel();
+        trainingDelimiterSize = new JSpinner();
+        trainingDelimiterColorLabel = new JLabel();
+        trainingDelimiterColor = new JLabel();
+        selectedItemColorLabel = new JLabel();
+        selectedItemColor = new JLabel();
+        mainTimerSizeLabel = new JLabel();
+        mainTimerSize = new JSpinner();
+        mainTimerColorLabel = new JLabel();
+        mainTimerColor = new JLabel();
+        mainTimerPositionLabel = new JLabel();
+        mainTimerPosition = new JComboBox();
+
     }
 }

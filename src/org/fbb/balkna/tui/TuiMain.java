@@ -7,7 +7,7 @@ import java.util.List;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.javax.JavaxWawPlayerProvider;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.Settings;
+import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.primitives.Training;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
