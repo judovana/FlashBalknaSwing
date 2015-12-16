@@ -1,6 +1,8 @@
 package org.fbb.balkna.swing;
 
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridLayout;
@@ -61,6 +63,7 @@ public class TraningWindow extends javax.swing.JDialog {
         });
         this.model = mainTimer;
         initComponents();
+        setTimerFont();
 
         jList1.setModel(new ListModel<BasicTime>() {
 
@@ -535,6 +538,25 @@ public class TraningWindow extends javax.swing.JDialog {
         //startButton.setText(SwingTranslator.R("Start"));
         validate();
         repaint();;
+    }
+
+    private void setTimerFont(int nvalue) {
+        timer.setFont(timer.getFont().deriveFont(Font.BOLD, nvalue));
+        if (Settings.getSettings().getMainTimerColor()!=null){
+            timer.setForeground(new Color(Settings.getSettings().getMainTimerColor()));
+        } else {
+            timer.setForeground(timer.getParent().getForeground());
+        }
+    }
+
+    void setTimerFont() {
+        int nvalue = Settings.getSettings().getMainTimerSize();
+        if (nvalue == 0) {
+            setTimerFont(36);
+        } else {
+            setTimerFont(nvalue);
+        }
+
     }
 
 }

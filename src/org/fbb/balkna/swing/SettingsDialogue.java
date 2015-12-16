@@ -6,6 +6,7 @@
 package org.fbb.balkna.swing;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -19,6 +20,7 @@ import java.net.URL;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -97,8 +99,10 @@ public class SettingsDialogue extends JDialog {
     private JSpinner mainTimerSize;
     private JLabel mainTimerColorLabel;
     private JLabel mainTimerColor;
-    private JLabel mainTimerPositionLabel;
-    private JComboBox mainTimerPosition;
+    private JLabel mainTimerPositionLabelV;
+    private JComboBox mainTimerPositionV;
+    private JLabel mainTimerPositionLabelH;
+    private JComboBox mainTimerPositionH;
 
     private final Training src;
 
@@ -293,17 +297,15 @@ public class SettingsDialogue extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (Desktop.isDesktopSupported()) {
-                    try{
-                    Desktop.getDesktop().browse(new URI("http://flashbb.cz/aktualne"));
-                    }catch(Exception ex){
+                    try {
+                        Desktop.getDesktop().browse(new URI("http://flashbb.cz/aktualne"));
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
             }
-            
-            
-});
-        
+
+        });
 
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
@@ -370,22 +372,118 @@ public class SettingsDialogue extends JDialog {
         iterationsModLabel.setText("  - Iterations modifier");
         settings.add(iterationsModLabel);
         settings.add(iterationsSpinner);
-        
-        
-        
+
         appearence.add(colorsInfo);
         appearence.add(trainingDelimiterSizeLabel);
         appearence.add(trainingDelimiterSize);
+        trainingDelimiterSize.setValue(Settings.getSettings().getTrainingDelimiterSize());
+        trainingDelimiterSize.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                Settings.getSettings().setTrainingDelimiterSize((Integer) ((JSpinner) e.getSource()).getValue());
+            }
+        });
         appearence.add(trainingDelimiterColorLabel);
         appearence.add(trainingDelimiterColor);
+        colorPreview(trainingDelimiterColor, Settings.getSettings().getTrainingDelimiterColor());
+        trainingDelimiterColor.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    Color q;
+                    if (Settings.getSettings().getTrainingDelimiterColor() == null) {
+                        q = JColorChooser.showDialog(null, null, null);
+                    } else {
+                        q = JColorChooser.showDialog(null, null, new Color(Settings.getSettings().getTrainingDelimiterColor()));
+                    }
+                    if (q != null) {
+                        Settings.getSettings().setTrainingDelimiterColor(q.getRGB());
+                    }
+                } else {
+                    Settings.getSettings().setTrainingDelimiterColor(null);
+                }
+                colorPreview(trainingDelimiterColor, Settings.getSettings().getTrainingDelimiterColor());
+            }
+
+        });
         appearence.add(selectedItemColorLabel);
         appearence.add(selectedItemColor);
+        colorPreview(selectedItemColor, Settings.getSettings().getSelectedItemColor());
+        selectedItemColor.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    Color q;
+                    if (Settings.getSettings().getSelectedItemColor() == null) {
+                        q = JColorChooser.showDialog(null, null, null);
+                    } else {
+                        q = JColorChooser.showDialog(null, null, new Color(Settings.getSettings().getSelectedItemColor()));
+                    }
+                    if (q != null) {
+                        Settings.getSettings().setSelectedItemColor(q.getRGB());
+                    }
+                } else {
+                    Settings.getSettings().setSelectedItemColor(null);
+                }
+                colorPreview(selectedItemColor, Settings.getSettings().getSelectedItemColor());
+            }
+
+        });
         appearence.add(mainTimerSizeLabel);
         appearence.add(mainTimerSize);
+        mainTimerSize.setValue(Settings.getSettings().getMainTimerSize());
+        mainTimerSize.addChangeListener(new ChangeListener() {
+
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                int nvalue = (Integer) ((JSpinner) e.getSource()).getValue();
+                Settings.getSettings().setMainTimerSize(nvalue);
+                if (TraningWindow.hack != null) {
+                    TraningWindow.hack.setTimerFont();
+                }
+            }
+        });
         appearence.add(mainTimerColorLabel);
         appearence.add(mainTimerColor);
-        appearence.add(mainTimerPositionLabel);
-        appearence.add(mainTimerPosition);
+        colorPreview(mainTimerColor, Settings.getSettings().getMainTimerColor());
+        mainTimerColor.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    Color q;
+                    if (Settings.getSettings().getMainTimerColor() == null) {
+                        q = JColorChooser.showDialog(null, null, null);
+                    } else {
+                        q = JColorChooser.showDialog(null, null, new Color(Settings.getSettings().getMainTimerColor()));
+                    }
+                    if (q != null) {
+                        Settings.getSettings().setMainTimerColor(q.getRGB());
+                    }
+                } else {
+                    Settings.getSettings().setMainTimerColor(null);
+                }
+                colorPreview(mainTimerColor, Settings.getSettings().getMainTimerColor());
+                if (TraningWindow.hack != null) {
+                    TraningWindow.hack.setTimerFont();
+                }
+            }
+
+        });
+        appearence.add(mainTimerPositionLabelV);
+        appearence.add(mainTimerPositionV);
+        appearence.add(mainTimerPositionLabelH);
+        appearence.add(mainTimerPositionH);
+    }
+
+    private void colorPreview(JLabel label, Integer value) {
+        if (value != null) {
+            label.setBackground(new Color(value));
+            label.setText("");
+        } else {
+            label.setText("system");
+            label.setBackground(label.getParent().getBackground());
+        }
     }
 
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -533,15 +631,15 @@ public class SettingsDialogue extends JDialog {
         colorsInfo.setText(SwingTranslator.R("colorsInfo"));
         trainingDelimiterSizeLabel.setText(SwingTranslator.R("trainingDelimiterSizeLabel"));
         trainingDelimiterColorLabel.setText(SwingTranslator.R("trainingDelimiterColorLabel"));
-        trainingDelimiterColor.setText("                  ");
         selectedItemColorLabel.setText(SwingTranslator.R("selectedItemColorLabel"));
-        selectedItemColor.setText("               ");
         mainTimerSizeLabel.setText(SwingTranslator.R("mainTimerSizeLabel"));
         mainTimerColorLabel.setText(SwingTranslator.R("mainTimerColorLabel"));
-        mainTimerColor.setText("             ");
-        mainTimerPositionLabel.setText(SwingTranslator.R("mainTimerPositionLabel"));
+        mainTimerPositionLabelV.setText(SwingTranslator.R("mainTimerPositionLabelV"));
+        mainTimerPositionLabelH.setText(SwingTranslator.R("mainTimerPositionLabelH"));
 
-        
+        trainingDelimiterColor.setOpaque(true);
+        selectedItemColor.setOpaque(true);
+        mainTimerColor.setOpaque(true);
         pack();
     }
 
@@ -591,17 +689,20 @@ public class SettingsDialogue extends JDialog {
 
         colorsInfo = new JLabel();
         trainingDelimiterSizeLabel = new JLabel();
-        trainingDelimiterSize = new JSpinner();
+        trainingDelimiterSize = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
         trainingDelimiterColorLabel = new JLabel();
         trainingDelimiterColor = new JLabel();
         selectedItemColorLabel = new JLabel();
         selectedItemColor = new JLabel();
         mainTimerSizeLabel = new JLabel();
-        mainTimerSize = new JSpinner();
+        mainTimerSize = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
         mainTimerColorLabel = new JLabel();
         mainTimerColor = new JLabel();
-        mainTimerPositionLabel = new JLabel();
-        mainTimerPosition = new JComboBox();
+        mainTimerPositionLabelV = new JLabel();
+        mainTimerPositionV = new JComboBox();
+        mainTimerPositionLabelH = new JLabel();
+        mainTimerPositionH = new JComboBox();
 
     }
+
 }
