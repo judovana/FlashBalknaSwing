@@ -656,6 +656,8 @@ public class SettingsDialogue extends JDialog {
         alowScreenChange.setText(SwingTranslator.R("alowScreenChange"));
         invertScreenLayout.setText(SwingTranslator.R("invertScreenLayout"));
 
+        resetButton.setText(SwingTranslator.R("resetButton"));
+        
         bothPannels.setTitleAt(0, SwingTranslator.R("settingsTab"));
         bothPannels.setTitleAt(1, SwingTranslator.R("appearenceTab"));
 
