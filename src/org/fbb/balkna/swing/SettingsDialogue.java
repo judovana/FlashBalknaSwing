@@ -197,6 +197,13 @@ public class SettingsDialogue extends JDialog {
         sharedButtons.setLayout(new java.awt.GridLayout(0, 1));
         this.getContentPane().add(sharedButtons, BorderLayout.SOUTH);
 
+        ratioCheckbox.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ratioCheckboxActionPerformed(e);
+            }
+        });
         appearence.add(ratioCheckbox);
 
         autoIterateLabel.setText("autoiterate images on timer with speed (s): (0 disabled)");
@@ -471,8 +478,32 @@ public class SettingsDialogue extends JDialog {
 
         });
         appearence.add(mainTimerPositionLabelV);
+        mainTimerPositionV.setModel(new DefaultComboBoxModel(Settings.VPOSITIONS));
+        mainTimerPositionV.setSelectedItem(Settings.getSettings().getMainTimerPositionV());
+        mainTimerPositionV.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.getSettings().setMainTimerPositionV(mainTimerPositionV.getSelectedItem().toString());
+                if (TraningWindow.hack!=null){
+                    TraningWindow.hack.setTimerFont();
+                }
+            }
+        });
         appearence.add(mainTimerPositionV);
         appearence.add(mainTimerPositionLabelH);
+        mainTimerPositionH.setModel(new DefaultComboBoxModel(Settings.HPOSITIONS));
+        mainTimerPositionH.setSelectedItem(Settings.getSettings().getMainTimerPositionH());
+         mainTimerPositionH.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Settings.getSettings().setMainTimerPositionH(mainTimerPositionH.getSelectedItem().toString());
+                if (TraningWindow.hack!=null){
+                    TraningWindow.hack.setTimerFont();
+                }
+            }
+        });
         appearence.add(mainTimerPositionH);
     }
 

@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
@@ -201,6 +202,7 @@ public class TraningWindow extends javax.swing.JDialog {
         };
         model.setSecondListener(secondListener);
         runAllListeners();
+        pack();
         ip.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -542,7 +544,7 @@ public class TraningWindow extends javax.swing.JDialog {
 
     private void setTimerFont(int nvalue) {
         timer.setFont(timer.getFont().deriveFont(Font.BOLD, nvalue));
-        if (Settings.getSettings().getMainTimerColor()!=null){
+        if (Settings.getSettings().getMainTimerColor() != null) {
             timer.setForeground(new Color(Settings.getSettings().getMainTimerColor()));
         } else {
             timer.setForeground(timer.getParent().getForeground());
@@ -556,6 +558,29 @@ public class TraningWindow extends javax.swing.JDialog {
         } else {
             setTimerFont(nvalue);
         }
+
+        int grav = SwingConstants.CENTER;
+        String v = Settings.getSettings().getMainTimerPositionV();
+        if (Settings.VPOS_T.equals(v)) {
+            grav = SwingConstants.TOP;
+        }
+        if (Settings.VPOS_B.equals(v)) {
+            grav = SwingConstants.BOTTOM;
+        }
+        timer.setVerticalTextPosition(grav);
+        timer.setVerticalAlignment(grav);
+
+        int ali = SwingConstants.CENTER;
+        String h = Settings.getSettings().getMainTimerPositionH();
+        if (Settings.HPOS_L.equals(h)) {
+            ali = SwingConstants.LEFT;
+        }
+        if (Settings.HPOS_R.equals(h)) {
+            ali = SwingConstants.RIGHT;
+        }
+
+        timer.setHorizontalAlignment(ali);
+        timer.setHorizontalTextPosition(ali);
 
     }
 
