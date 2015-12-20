@@ -23,6 +23,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -59,6 +60,7 @@ public class SettingsDialogue extends JDialog {
     private javax.swing.JButton downloadButton;
     private javax.swing.JLabel exercisesModLabel;
     private javax.swing.JButton exportButton;
+    private javax.swing.JButton localPlugin;
     private javax.swing.JLabel iterationsModLabel;
     private javax.swing.JSpinner iterationsSpinner;
     private javax.swing.JComboBox jComboBox1;
@@ -360,7 +362,23 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(managePluginsButton);
+        localPlugin.addActionListener(new ActionListener() {
 
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try{
+                JFileChooser jf = new JFileChooser();
+                int x = jf.showOpenDialog(null);
+                if (jf.getSelectedFile()!=null && x == JFileChooser.APPROVE_OPTION){
+                    jTextField1.setText(jf.getSelectedFile().toURI().toURL().toExternalForm());
+                }
+            } catch(Exception ex){
+                ex.printStackTrace();
+            }
+            }
+        });
+        settings.add(localPlugin);
+        
         exercisesModLabel.setText("Exercise modifiers:");
         settings.add(exercisesModLabel);
 
@@ -645,6 +663,7 @@ public class SettingsDialogue extends JDialog {
         closeButton.setText(SwingTranslator.R("Close"));
         closeButton.setFont(closeButton.getFont().deriveFont(Font.BOLD));
         exportButton.setText(SwingTranslator.R("Export"));
+        localPlugin.setText(SwingTranslator.R("localPlugin"));
         downloadButton.setText(SwingTranslator.R("Upload"));
         managePluginsButton.setText(SwingTranslator.R("ManagePlugins"));
         exercisesModLabel.setText(SwingTranslator.R("ExerciseModifiers"));
@@ -701,6 +720,7 @@ public class SettingsDialogue extends JDialog {
         allowSkipping = new javax.swing.JCheckBox();
         creditsLabel = new javax.swing.JLabel();
         exportButton = new javax.swing.JButton();
+        localPlugin = new javax.swing.JButton();
         downloadButton = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         saveForOfline = new javax.swing.JCheckBox();
