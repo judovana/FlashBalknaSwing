@@ -18,6 +18,7 @@ import org.fbb.balkna.javax.JavaxWawPlayerProvider;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
+import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.swing.locales.SwingTranslator;
@@ -68,6 +69,18 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             Exercise e = (Exercise) exercisesList.getSelectedValue();
             Training t = new Training(e);
             select(t);
+        }
+        repaint();
+
+    }
+
+    private void selectCycle() {
+        if (cyclesList.getSelectedValue() == null) {
+            deselect();
+        } else {
+            Cycle c = (Cycle) cyclesList.getSelectedValue();
+            jTextArea1.setText(c.getStory());
+            jTextArea1.setCaretPosition(0);
         }
         repaint();
 
@@ -222,32 +235,31 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    
-    public Training getSelectedTraining(){
-         if (jTabbedPane1.getSelectedIndex() == 1) {
+    public Training getSelectedTraining() {
+        if (jTabbedPane1.getSelectedIndex() == 1) {
             if (trainingsList.getSelectedValue() != null) {
                 Training t = (Training) trainingsList.getSelectedValue();
-               return t;
+                return t;
             }
         }
-         if (jTabbedPane1.getSelectedIndex() == 0) {
+        if (jTabbedPane1.getSelectedIndex() == 0) {
             if (exercisesList.getSelectedValue() != null) {
                 Exercise ex = (Exercise) exercisesList.getSelectedValue();
                 Training t = new Training(ex);
                 return t;
             }
         }
-         return null;
+        return null;
     }
-    
+
     private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
-       Training t = getSelectedTraining();
-               if (t!=null){
-                List<BasicTime> l = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
-                l.add(0, Model.getModel().getWarmUp());
-                TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t);
-                traningWindow.setVisible(true);
-            }
+        Training t = getSelectedTraining();
+        if (t != null) {
+            List<BasicTime> l = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
+            l.add(0, Model.getModel().getWarmUp());
+            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t);
+            traningWindow.setVisible(true);
+        }
     }//GEN-LAST:event_startTrainingButtonActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -389,6 +401,31 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         };
         exercisesList.setModel(exList);
 
+        final List<Cycle> cycles = Model.getModel().getCycles();
+        ListModel<Cycle> cyclesModel = new ListModel<Cycle>() {
+
+            @Override
+            public int getSize() {
+                return cycles.size();
+            }
+
+            @Override
+            public Cycle getElementAt(int index) {
+                return cycles.get(index);
+            }
+
+            @Override
+            public void addListDataListener(ListDataListener l) {
+
+            }
+
+            @Override
+            public void removeListDataListener(ListDataListener l) {
+
+            }
+        };
+        cyclesList.setModel(cyclesModel);
+
         imgPreview.add(ip);
         trainingsList.addListSelectionListener(new ListSelectionListener() {
 
@@ -404,6 +441,15 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 selectExercise();
+            }
+
+        });
+
+        cyclesList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                selectCycle();
             }
 
         });
