@@ -18,8 +18,8 @@ import org.fbb.balkna.javax.JavaxWawPlayerProvider;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
+import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
-import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.fbb.balkna.tui.TuiMain;
 
@@ -37,17 +37,37 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     private final KeyEventDispatcher f1;
 
     private void selectTraining() {
-        if (jList1.getSelectedValue() == null) {
-            ip.setSrc(ImgUtils.getDefaultImage());
-            jTextArea1.setText(Model.getModel().getDefaultStory() + getSwingGuiStory());
-            startTrainingButton.setEnabled(false);
+        if (trainingsList.getSelectedValue() == null) {
+            deselect();
         } else {
-            Training t = (Training) jList1.getSelectedValue();
-            List<BufferedImage> l = ImgUtils.getTrainingImages(t, ip.getWidth(), ip.getHeight());
-            ip.setSrcs(l);
-            jTextArea1.setText(t.getStory());
-            jTextArea1.setCaretPosition(0);
-            startTrainingButton.setEnabled(true);
+            Training t = getSelectedTraining();
+            select(t);
+        }
+        repaint();
+
+    }
+
+    private void select(Training t) {
+        List<BufferedImage> l = ImgUtils.getTrainingImages(t, ip.getWidth(), ip.getHeight());
+        ip.setSrcs(l);
+        jTextArea1.setText(t.getStory());
+        jTextArea1.setCaretPosition(0);
+        startTrainingButton.setEnabled(true);
+    }
+
+    private void deselect() {
+        ip.setSrc(ImgUtils.getDefaultImage());
+        jTextArea1.setText(Model.getModel().getDefaultStory() + getSwingGuiStory());
+        startTrainingButton.setEnabled(false);
+    }
+
+    private void selectExercise() {
+        if (exercisesList.getSelectedValue() == null) {
+            deselect();
+        } else {
+            Exercise e = (Exercise) exercisesList.getSelectedValue();
+            Training t = new Training(e);
+            select(t);
         }
         repaint();
 
@@ -68,7 +88,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
                         @Override
                         public void run() {
-                            SettingsDialogue d = new SettingsDialogue((Training) jList1.getSelectedValue());
+                            SettingsDialogue d = new SettingsDialogue(getSelectedTraining());
                             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
                             d.setVisible(true);
                             d.dispose();
@@ -98,8 +118,13 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         pnelWithList = new javax.swing.JPanel();
         buttonsPanel = new javax.swing.JPanel();
         startTrainingButton = new javax.swing.JButton();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        exercisesList = new javax.swing.JList();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList();
+        trainingsList = new javax.swing.JList();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        cyclesList = new javax.swing.JList();
         panelWithInfo = new javax.swing.JPanel();
         imgPreview = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -134,11 +159,31 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
         pnelWithList.add(buttonsPanel, java.awt.BorderLayout.PAGE_END);
 
-        jList1.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-        jList1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jScrollPane1.setViewportView(jList1);
+        jTabbedPane1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jTabbedPane1StateChanged(evt);
+            }
+        });
 
-        pnelWithList.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        exercisesList.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        exercisesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane3.setViewportView(exercisesList);
+
+        jTabbedPane1.addTab("tab1", jScrollPane3);
+
+        trainingsList.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        trainingsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane1.setViewportView(trainingsList);
+
+        jTabbedPane1.addTab("tab1", jScrollPane1);
+
+        cyclesList.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        cyclesList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPane4.setViewportView(cyclesList);
+
+        jTabbedPane1.addTab("tab1", jScrollPane4);
+
+        pnelWithList.add(jTabbedPane1, java.awt.BorderLayout.CENTER);
 
         jPanel1.add(pnelWithList);
 
@@ -177,16 +222,32 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
-
-        if (jList1.getSelectedValue() != null) {
-            Training t = (Training) jList1.getSelectedValue();
-            List<BasicTime> l = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
-            l.add(0, Model.getModel().getWarmUp());
-            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t);
-            traningWindow.setVisible(true);
+    
+    public Training getSelectedTraining(){
+         if (jTabbedPane1.getSelectedIndex() == 1) {
+            if (trainingsList.getSelectedValue() != null) {
+                Training t = (Training) trainingsList.getSelectedValue();
+               return t;
+            }
         }
-
+         if (jTabbedPane1.getSelectedIndex() == 0) {
+            if (exercisesList.getSelectedValue() != null) {
+                Exercise ex = (Exercise) exercisesList.getSelectedValue();
+                Training t = new Training(ex);
+                return t;
+            }
+        }
+         return null;
+    }
+    
+    private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
+       Training t = getSelectedTraining();
+               if (t!=null){
+                List<BasicTime> l = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
+                l.add(0, Model.getModel().getWarmUp());
+                TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t);
+                traningWindow.setVisible(true);
+            }
     }//GEN-LAST:event_startTrainingButtonActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -198,6 +259,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         // TODO add your handling code here:
         KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
     }//GEN-LAST:event_formWindowClosing
+
+    private void jTabbedPane1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1StateChanged
+        deselect();
+    }//GEN-LAST:event_jTabbedPane1StateChanged
 
     /**
      * @param args the command line arguments
@@ -225,6 +290,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
                         try {
                             new FlashBoulderBalkna().setVisible(true);
                         } catch (Exception ex) {
+                            ex.printStackTrace();
                             System.err.println(SwingTranslator.R("NoGui"));
                             tui[0] = true;
                         }
@@ -232,28 +298,35 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
                 });
             }
         } catch (InterruptedException ex) {
+            ex.printStackTrace();
             System.err.println(SwingTranslator.R("NoGui"));
             tui[0] = true;
         } catch (InvocationTargetException ex) {
+            ex.printStackTrace();
             System.err.println(SwingTranslator.R("NoGui"));
             tui[0] = true;
         }
-        if (tui[0]){
+        if (tui[0]) {
             TuiMain.main(args);
-            
+
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonsPanel;
+    private javax.swing.JList cyclesList;
+    private javax.swing.JList exercisesList;
     private javax.swing.JPanel imgPreview;
-    private javax.swing.JList jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JPanel panelWithInfo;
     private javax.swing.JPanel pnelWithList;
     private javax.swing.JButton startTrainingButton;
+    private javax.swing.JList trainingsList;
     // End of variables declaration//GEN-END:variables
 
     private String getSwingGuiStory() {
@@ -289,9 +362,35 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
             }
         };
-        jList1.setModel(mainList);
+        trainingsList.setModel(mainList);
+
+        final List<Exercise> exercises = Model.getModel().getExercises();
+        ListModel<Exercise> exList = new ListModel<Exercise>() {
+
+            @Override
+            public int getSize() {
+                return exercises.size();
+            }
+
+            @Override
+            public Exercise getElementAt(int index) {
+                return exercises.get(index);
+            }
+
+            @Override
+            public void addListDataListener(ListDataListener l) {
+
+            }
+
+            @Override
+            public void removeListDataListener(ListDataListener l) {
+
+            }
+        };
+        exercisesList.setModel(exList);
+
         imgPreview.add(ip);
-        jList1.addListSelectionListener(new ListSelectionListener() {
+        trainingsList.addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -299,12 +398,26 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             }
 
         });
+
+        exercisesList.addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                selectExercise();
+            }
+
+        });
+        jTabbedPane1.setSelectedIndex(1);
         selectTraining();
     }
 
     final void setLocales() {
         setTitle(Model.getModel().getTitle());
         startTrainingButton.setText(SwingTranslator.R("StartTraining"));
+
+        jTabbedPane1.setTitleAt(0, (SwingTranslator.R("mainTabExercise")));
+        jTabbedPane1.setTitleAt(1, (SwingTranslator.R("mainTabTrainings")));
+        jTabbedPane1.setTitleAt(2, (SwingTranslator.R("mainTabCycles")));
     }
 
 }
