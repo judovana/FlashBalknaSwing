@@ -17,6 +17,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
@@ -50,9 +51,23 @@ public class TraningWindow extends javax.swing.JDialog {
 
     TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src) {
         super(parent, src.getName(), modal);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent ev) {
+                if (jList1.getSelectedIndex() < jList1.getModel().getSize() - 1) {
+
+                    int a = JOptionPane.showConfirmDialog(TraningWindow.this, SwingTranslator.R("AndroidBackTraining"));
+                    if (a == JOptionPane.YES_OPTION) {
+                        TraningWindow.this.dispose();
+                    }
+                } else {
+                    TraningWindow.this.dispose();
+                }
+
+            }
+        });
         TraningWindow.hack = this;
         this.src = src;
-        this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -279,7 +294,7 @@ public class TraningWindow extends javax.swing.JDialog {
         startButton = new javax.swing.JButton();
         skipButton = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);

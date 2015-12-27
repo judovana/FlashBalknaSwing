@@ -33,7 +33,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     public static final File exportDir = new File(System.getProperty("user.home"));
     public static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
-
+    
     final ImagePreviewComponent ip = new ImagePreviewComponent();
     static FlashBoulderBalkna hack;
     private final KeyEventDispatcher f1;
@@ -80,6 +80,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             deselect();
         } else {
             Cycle c = (Cycle) cyclesList.getSelectedValue();
+            c.load();
             textPreview.setText(c.getStory());
             textPreview.setCaretPosition(0);
             startTrainingButton.setEnabled(true);
