@@ -22,6 +22,7 @@ import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.history.Record;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.fbb.balkna.tui.TuiMain;
 
@@ -33,7 +34,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     public static final File exportDir = new File(System.getProperty("user.home"));
     public static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
-    
+
     final ImagePreviewComponent ip = new ImagePreviewComponent();
     static FlashBoulderBalkna hack;
     private final KeyEventDispatcher f1;
@@ -61,6 +62,9 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         ip.setSrc(ImgUtils.getDefaultImage());
         textPreview.setText(Model.getModel().getDefaultStory() + getSwingGuiStory());
         startTrainingButton.setEnabled(false);
+        trainingForward.setEnabled(false);
+        trainingBack.setEnabled(false);
+        currentTraining.setText(SwingTranslator.R("trainingCurrent", "?"));
     }
 
     private void selectExercise() {
@@ -80,11 +84,13 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             deselect();
         } else {
             Cycle c = (Cycle) cyclesList.getSelectedValue();
-            c.load();
+            currentTraining.setText(SwingTranslator.R("trainingCurrent", c.getTrainingPointer() + " - " + c.getTraining().getName()));
+            trainingForward.setEnabled(true);
+            trainingBack.setEnabled(true);
             textPreview.setText(c.getStory());
             textPreview.setCaretPosition(0);
             startTrainingButton.setEnabled(true);
-            
+
         }
         repaint();
 
@@ -105,7 +111,12 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
                         @Override
                         public void run() {
-                            SettingsDialogue d = new SettingsDialogue(getSelectedTraining());
+                            TrainingWithCycle tc = getSelectedTraining();
+                            Training t = null;
+                            if (tc!=null){
+                                t = tc.t;
+                            }
+                            SettingsDialogue d = new SettingsDialogue(t);
                             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
                             d.setVisible(true);
                             d.dispose();
@@ -144,9 +155,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         jScrollPane4 = new javax.swing.JScrollPane();
         cyclesList = new javax.swing.JList();
         jPanel3 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        currentTraining = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        trainingBack = new javax.swing.JButton();
+        trainingForward = new javax.swing.JButton();
         panelWithInfo = new javax.swing.JPanel();
         imgPreview = new javax.swing.JPanel();
         textPreviewContainer = new javax.swing.JScrollPane();
@@ -207,18 +219,32 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
         jPanel2.add(jScrollPane4, java.awt.BorderLayout.CENTER);
 
-        jPanel3.setLayout(new java.awt.GridLayout());
+        jPanel3.setLayout(new java.awt.GridLayout(2, 1));
 
-        jButton1.setText("Training back");
-        jPanel3.add(jButton1);
+        currentTraining.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        currentTraining.setText("Current training:");
+        currentTraining.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jPanel3.add(currentTraining);
 
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("Current training:");
-        jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jPanel3.add(jLabel1);
+        jPanel4.setLayout(new java.awt.GridLayout(1, 2));
 
-        jButton2.setText("Skip training");
-        jPanel3.add(jButton2);
+        trainingBack.setText("Training back");
+        trainingBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trainingBackActionPerformed(evt);
+            }
+        });
+        jPanel4.add(trainingBack);
+
+        trainingForward.setText("Skip forward");
+        trainingForward.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trainingForwardActionPerformed(evt);
+            }
+        });
+        jPanel4.add(trainingForward);
+
+        jPanel3.add(jPanel4);
 
         jPanel2.add(jPanel3, java.awt.BorderLayout.PAGE_END);
 
@@ -262,37 +288,57 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    private static class TrainingWithCycle{
+        final Cycle c;
+        final Training t;
 
-    public Training getSelectedTraining() {
+        public TrainingWithCycle(Cycle c, Training t) {
+            this.c = c;
+            this.t = t;
+        }
+           public TrainingWithCycle(Training t) {
+            this.c = null;
+            this.t = t;
+        }
+        
+        
+    }
+    
+    public TrainingWithCycle getSelectedTraining() {
         if (jTabbedPane1.getSelectedIndex() == 1) {
             if (trainingsList.getSelectedValue() != null) {
                 Training t = (Training) trainingsList.getSelectedValue();
-                return t;
+                return new TrainingWithCycle(t);
             }
         }
         if (jTabbedPane1.getSelectedIndex() == 0) {
             if (exercisesList.getSelectedValue() != null) {
                 Exercise ex = (Exercise) exercisesList.getSelectedValue();
                 Training t = new Training(ex);
-                return t;
+                return new TrainingWithCycle(t);
             }
         }
-         if (jTabbedPane1.getSelectedIndex() == 2) {
+        if (jTabbedPane1.getSelectedIndex() == 2) {
             if (cyclesList.getSelectedValue() != null) {
                 Cycle ex = (Cycle) cyclesList.getSelectedValue();
-                Training t = ex.getTraining(0);
-                return t;
+                Training t = ex.getTraining();
+                return new TrainingWithCycle(ex,t);
             }
         }
         return null;
     }
 
     private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
-        Training t = getSelectedTraining();
+        TrainingWithCycle t = getSelectedTraining();
         if (t != null) {
-            List<BasicTime> l = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
+            if (t.c!=null){
+                t.c.startCyclesTraining();
+            }
+            List<BasicTime> l = t.t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             l.add(0, Model.getModel().getWarmUp());
-            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t);
+            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t);
+            t.t.started();
+            deselect();
             traningWindow.setVisible(true);
         }
     }//GEN-LAST:event_startTrainingButtonActionPerformed
@@ -322,6 +368,25 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             panelWithInfo.validate();
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
+
+    private void trainingBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trainingBackActionPerformed
+        // TODO add your handling code here:
+        TrainingWithCycle tc = getSelectedTraining();
+        if (tc != null && tc.c!=null){
+            tc.c.decTrainingPointer();
+            tc.c.modified();
+            selectCycle();
+        }
+    }//GEN-LAST:event_trainingBackActionPerformed
+
+    private void trainingForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trainingForwardActionPerformed
+        TrainingWithCycle tc = getSelectedTraining();
+        if (tc != null && tc.c!=null){
+            tc.c.incTrainingPointer();
+            tc.c.modified();
+            selectCycle();
+        }
+    }//GEN-LAST:event_trainingForwardActionPerformed
 
     /**
      * @param args the command line arguments
@@ -372,15 +437,14 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonsPanel;
+    private javax.swing.JLabel currentTraining;
     private javax.swing.JList cyclesList;
     private javax.swing.JList exercisesList;
     private javax.swing.JPanel imgPreview;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
@@ -390,6 +454,8 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     private javax.swing.JButton startTrainingButton;
     private javax.swing.JTextArea textPreview;
     private javax.swing.JScrollPane textPreviewContainer;
+    private javax.swing.JButton trainingBack;
+    private javax.swing.JButton trainingForward;
     private javax.swing.JList trainingsList;
     // End of variables declaration//GEN-END:variables
 
@@ -512,6 +578,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     final void setLocales() {
         setTitle(Model.getModel().getTitle());
         startTrainingButton.setText(SwingTranslator.R("StartTraining"));
+
+        trainingBack.setText(SwingTranslator.R("trainingBack"));
+        trainingForward.setText(SwingTranslator.R("trainingFwd"));
+        currentTraining.setText(SwingTranslator.R("trainingCurrent", "?"));
 
         jTabbedPane1.setTitleAt(0, (SwingTranslator.R("mainTabExercise")));
         jTabbedPane1.setTitleAt(1, (SwingTranslator.R("mainTabTrainings")));

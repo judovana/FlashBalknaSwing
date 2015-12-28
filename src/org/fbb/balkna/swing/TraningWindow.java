@@ -31,6 +31,7 @@ import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.PausaTime;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.history.Record;
 import org.fbb.balkna.model.utils.TimeUtils;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 
@@ -48,16 +49,21 @@ public class TraningWindow extends javax.swing.JDialog {
     Runnable oneTenthOfSecondListener;
     Runnable secondListener;
     private final Training src;
+    private int skipps;
 
     TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src) {
         super(parent, src.getName(), modal);
+        skipps = 0;
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent ev) {
                 if (jList1.getSelectedIndex() < jList1.getModel().getSize() - 1) {
 
                     int a = JOptionPane.showConfirmDialog(TraningWindow.this, SwingTranslator.R("AndroidBackTraining"));
                     if (a == JOptionPane.YES_OPTION) {
+                        src.canceled();
+                        model.getCurrent().getOriginator().getOriginal().canceled();
                         TraningWindow.this.dispose();
                     }
                 } else {
@@ -123,7 +129,14 @@ public class TraningWindow extends javax.swing.JDialog {
                 jList1.setSelectedIndex(model.getIndex());
                 jList1.ensureIndexIsVisible(model.getIndex());
                 BasicTime time = model.getCurrent();
+                Exercise currentExercise = time.getOriginator().getOriginal();
                 if (model.isEnded()) {
+                    currentExercise.finished();
+                    if (skipps==0){
+                        src.finished();
+                    } else {
+                        src.finishedWithSkips();
+                    }
                     pauseRestInfoLabel.setText(time.getEndMssage());
                     ip.resetSrcs();
                     nowNextLAbel.setText("");
@@ -137,13 +150,14 @@ public class TraningWindow extends javax.swing.JDialog {
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
                     if (time instanceof PausaTime) {
                         ((BgLabel) timer).cross(true);
+                        currentExercise.finished();
                         nowNextLAbel.setText(model.next());
                         BasicTime ntime = model.getNext();
-                        Exercise t = ntime.getOriginator().getOriginal();
-                        List<BufferedImage> l = ImgUtils.getExerciseImages(t, ip.getWidth(), ip.getHeight());
+                        Exercise nextTime = ntime.getOriginator().getOriginal();
+                        List<BufferedImage> l = ImgUtils.getExerciseImages(nextTime, ip.getWidth(), ip.getHeight());
                         ip.setSrcs(l);
-                        jTextArea1.setText(t.getDescription());
-                        nowNextLAbel.setText(model.next() + " " + t.getName());
+                        jTextArea1.setText(nextTime.getDescription());
+                        nowNextLAbel.setText(model.next() + " " + nextTime.getName());
                         if (((BgLabel) timer).getImgs() != null) {
                             ((BgLabel) timer).setSrcs(ip.getSrcs());
                             ((BgLabel) timer).setSelcted(ip.getSelcted());
@@ -159,13 +173,13 @@ public class TraningWindow extends javax.swing.JDialog {
                         }
 
                     } else {
+                        currentExercise.started();
                         ((BgLabel) timer).cross(false);
                         nowNextLAbel.setText(model.now());
-                        Exercise t = time.getOriginator().getOriginal();
-                        List<BufferedImage> l = ImgUtils.getExerciseImages(t, ip.getWidth(), ip.getHeight());
+                        List<BufferedImage> l = ImgUtils.getExerciseImages(currentExercise, ip.getWidth(), ip.getHeight());
                         ip.setSrcs(l);
-                        jTextArea1.setText(t.getDescription());
-                        nowNextLAbel.setText(model.now() + " " + t.getName());
+                        jTextArea1.setText(currentExercise.getDescription());
+                        nowNextLAbel.setText(model.now() + " " + currentExercise.getName());
                         if (((BgLabel) timer).getImgs() != null) {
                             ((BgLabel) timer).setSrcs(ip.getSrcs());
                             ((BgLabel) timer).setSelcted(ip.getSelcted());
@@ -438,6 +452,8 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
+        skipps ++;
+        model.getCurrent().getOriginator().getOriginal().canceled();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
         model.skipForward();
@@ -460,6 +476,8 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
+        skipps --;
+        model.getCurrent().getOriginator().getOriginal().canceled();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
         model.jumpBack();
