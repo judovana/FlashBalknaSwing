@@ -42,6 +42,7 @@ import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
+import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.primitives.history.RecordWithOrigin;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
@@ -111,12 +112,20 @@ public class SettingsDialogue extends JDialog {
     private JLabel mainTimerPositionLabelH;
     private JComboBox mainTimerPositionH;
     private JCheckBox saveStats;
+    private JCheckBox exCheck;
+    private JCheckBox trCheck;
+    private JCheckBox cycCheck;
+    private JButton exDel;
+    private JButton trDel;
+    private JButton cycDel;
     private JList<RecordWithOrigin> statisticList;
 
-    private final Training src;
+    private final Training src1;
+    private final Cycle src2;
 
-    public SettingsDialogue(final Training src) {
-        this.src = src;
+    public SettingsDialogue(final Training src1, Cycle src2) {
+        this.src1 = src1;
+        this.src2 = src2;
         this.setModal(true);
         init();
 
@@ -173,7 +182,7 @@ public class SettingsDialogue extends JDialog {
     private void prepare() {
         jComboBox1.setModel(new DefaultComboBoxModel(Packages.SOUND_PACKS));
         jComboBox1.setSelectedItem(SoundProvider.getInstance().getUsedSoundPack());
-        if (src == null) {
+        if (src1 == null && src2 == null) {
             exportButton.setEnabled(false);
         } else {
             exportButton.setEnabled(true);
@@ -200,31 +209,28 @@ public class SettingsDialogue extends JDialog {
         bothPannels.add(appearence);
         bothPannels.add(stats);
 
-        statisticList.setModel(new AbstractListModel() {
-
-            List<RecordWithOrigin> data = Model.getModel().gatherStatistics();
-
-            @Override
-            public int getSize() {
-                return data.size();
-            }
-
-            @Override
-            public Object getElementAt(int i) {
-                return data.get(i);
-            }
-        });
+        reloadStats();
         stats.setLayout(new BorderLayout());
         JScrollPane jsp = new JScrollPane(statisticList);
         stats.add(jsp);
         JPanel jpp = new JPanel(new GridLayout(2, 3));
         stats.add(jpp, BorderLayout.SOUTH);
-        jpp.add(new JCheckBox("mainTabExercise", true));
-        jpp.add(new JCheckBox("mainTabTrainings", true));
-        jpp.add(new JCheckBox("mainTabCycles", true));
-        jpp.add(new JButton("clean"));
-        jpp.add(new JButton("clean"));
-        jpp.add(new JButton("clean (ask if sure)"));
+        ActionListener al = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadStats();
+            }
+        };
+        exCheck.addActionListener(al);
+        trCheck.addActionListener(al);
+        cycCheck.addActionListener(al);
+        jpp.add(exCheck);
+        jpp.add(trCheck);
+        jpp.add(cycCheck);
+        jpp.add(exDel);
+        jpp.add(trDel);
+        jpp.add(cycDel);
 
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(bothPannels, BorderLayout.CENTER);
@@ -611,8 +617,14 @@ public class SettingsDialogue extends JDialog {
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         try {
-            if (src != null) {
-                File f = src.export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
+              if (src2 != null) {
+                File f = src2.export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
+                if (Desktop.isDesktopSupported()) {
+                    Desktop.getDesktop().browse(f.toURI());
+                }
+            }
+            if (src1 != null) {
+                File f = src1.export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().browse(f.toURI());
                 }
@@ -752,6 +764,14 @@ public class SettingsDialogue extends JDialog {
         trainingDelimiterColor.setOpaque(true);
         selectedItemColor.setOpaque(true);
         mainTimerColor.setOpaque(true);
+
+        exCheck.setText(SwingTranslator.R("mainTabExercise"));
+        trCheck.setText(SwingTranslator.R("mainTabTrainings"));
+        cycCheck.setText(SwingTranslator.R("mainTabCycles"));
+        exDel.setText(SwingTranslator.R("delete"));
+        trDel.setText(SwingTranslator.R("delete"));
+        cycDel.setText("clean (ask if sure)");
+
         pack();
     }
 
@@ -818,7 +838,31 @@ public class SettingsDialogue extends JDialog {
         mainTimerPositionLabelH = new JLabel();
         mainTimerPositionH = new JComboBox();
         saveStats = new JCheckBox();
+        cycCheck = new JCheckBox("", true);
+        trCheck = new JCheckBox("", true);
+        exCheck = new JCheckBox("", false);
 
+        cycDel = new JButton("");
+        trDel = new JButton("");
+        exDel = new JButton("");
+
+    }
+
+    private void reloadStats() {
+        statisticList.setModel(new AbstractListModel() {
+
+            List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
+
+            @Override
+            public int getSize() {
+                return data.size();
+            }
+
+            @Override
+            public Object getElementAt(int i) {
+                return data.get(i);
+            }
+        });
     }
 
 }

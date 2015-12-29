@@ -113,10 +113,12 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
                         public void run() {
                             TrainingWithCycle tc = getSelectedTraining();
                             Training t = null;
+                            Cycle c = null;
                             if (tc!=null){
                                 t = tc.t;
+                                c = tc.c;
                             }
-                            SettingsDialogue d = new SettingsDialogue(t);
+                            SettingsDialogue d = new SettingsDialogue(t, c);
                             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
                             d.setVisible(true);
                             d.dispose();
