@@ -122,6 +122,7 @@ public class SettingsDialogue extends JDialog {
     private JCheckBox exCheck;
     private JCheckBox trCheck;
     private JCheckBox cycCheck;
+    private JCheckBox playLongTermSounds;
     private JButton exDel;
     private JButton trDel;
     private JButton cycDel;
@@ -205,6 +206,7 @@ public class SettingsDialogue extends JDialog {
         invertScreenLayout.setSelected(Settings.getSettings().isInvertScreenCompress());
         alowScreenChange.setSelected(Settings.getSettings().isAllowScreenChange());
         ratioCheckbox.setSelected(Model.getModel().isRatioForced());
+        playLongTermSounds.setSelected(Settings.getSettings().isPlayLongTermSounds());
         this.pack();
 
     }
@@ -318,6 +320,14 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(mute);
+        
+        playLongTermSounds.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                  Settings.getSettings().setPlayLongTermSounds(playLongTermSounds.isSelected());
+            }
+        });
+        settings.add(playLongTermSounds);
 
         invertScreenLayout.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -846,6 +856,7 @@ public class SettingsDialogue extends JDialog {
         exDel.setText(SwingTranslator.R("delete"));
         trDel.setText(SwingTranslator.R("delete"));
         cycDel.setText(SwingTranslator.R("delete"));
+        playLongTermSounds.setText(SwingTranslator.R("playLongTermSounds"));
 
         singleExerciseOverrideLabel.setText(SwingTranslator.R("singleTrainingOverride"));;
 
@@ -918,6 +929,7 @@ public class SettingsDialogue extends JDialog {
         cycCheck = new JCheckBox("", true);
         trCheck = new JCheckBox("", true);
         exCheck = new JCheckBox("", false);
+        playLongTermSounds = new JCheckBox();
 
         cycDel = new JButton("");
         trDel = new JButton("");

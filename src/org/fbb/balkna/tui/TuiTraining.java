@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
+import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
@@ -45,6 +46,7 @@ class TuiTraining {
                         ConsoleImageViewer.doJob(ImgUtils.getDefaultImage());
                     }
                     System.out.println(time.getEndMssage());
+                    //SoundProvider.getInstance().getPStrainingEnd().playAsync();
                     System.exit(0);
 
                 } else {
@@ -110,7 +112,7 @@ class TuiTraining {
             public void run() {
                 BasicTime c = model.getCurrent();
                 if (TuiMain.globalSounds) {
-                    c.soundLogicRuntime();
+                    c.soundLogicRuntime(model);
                 }
                 final String s = TimeUtils.secondsToMinutes(model.getCurrent().getCurrentValue()) + ":" + model.getTenthOfSecond();
                 System.out.println(s);

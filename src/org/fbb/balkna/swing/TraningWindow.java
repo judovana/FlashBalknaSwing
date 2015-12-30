@@ -24,6 +24,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
+import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
@@ -144,7 +145,7 @@ public class TraningWindow extends javax.swing.JDialog {
                         ((BgLabel) timer).setSrcs(ip.getSrcs());
                         ((BgLabel) timer).setSelcted(ip.getSelcted());
                     }
-
+                    SoundProvider.getInstance().getPStrainingEnd().playAsync();
                 } else {
                     time.play();
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
@@ -215,7 +216,7 @@ public class TraningWindow extends javax.swing.JDialog {
             @Override
             public void run() {
                 BasicTime c = model.getCurrent();
-                c.soundLogicRuntime();
+                c.soundLogicRuntime(model);
                 final String s = TimeUtils.secondsToHours(c.getCurrentValue() + model.getFutureTime()) + "/" + TimeUtils.secondsToHours(model.getTotalTime());
                 //System.out.println(s);
                 SwingUtilities.invokeLater(new Runnable() {
@@ -452,7 +453,9 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
-        skipps ++;
+        if (!(model.getCurrent() instanceof  PausaTime)){
+            skipps ++;
+        }
         model.getCurrent().getOriginator().getOriginal().canceled();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
@@ -476,7 +479,9 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
-        skipps --;
+        if (!(model.getCurrent() instanceof  PausaTime)){
+            skipps --;
+        }
         model.getCurrent().getOriginator().getOriginal().canceled();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
