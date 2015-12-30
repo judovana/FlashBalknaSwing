@@ -33,17 +33,24 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.primitives.Cycle;
+import org.fbb.balkna.model.primitives.Cycles;
+import org.fbb.balkna.model.primitives.ExerciseOverrides;
+import org.fbb.balkna.model.primitives.Exercises;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.Trainings;
 import org.fbb.balkna.model.primitives.history.RecordWithOrigin;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
@@ -119,6 +126,9 @@ public class SettingsDialogue extends JDialog {
     private JButton trDel;
     private JButton cycDel;
     private JList<RecordWithOrigin> statisticList;
+    private JLabel singleExerciseOverrideLabel;
+    private JTextField singleExerciseOverride;
+    private JLabel singleExerciseParsed;
 
     private final Training src1;
     private final Cycle src2;
@@ -231,6 +241,44 @@ public class SettingsDialogue extends JDialog {
         jpp.add(exDel);
         jpp.add(trDel);
         jpp.add(cycDel);
+
+        exDel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File[] ff = Exercises.getStatsDir().listFiles();
+                for (File f : ff) {
+                    f.delete();
+                }
+                reloadStats();
+            }
+        });
+        trDel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File[] ff = Trainings.getStatsDir().listFiles();
+                for (File f : ff) {
+                    f.delete();
+                }
+                reloadStats();
+            }
+        });
+
+        cycDel.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                File[] ff = Cycles.getStatsDir().listFiles();
+                int a = JOptionPane.showConfirmDialog(null, SwingTranslator.R("CylesClearWarning"));
+                if (a == JOptionPane.YES_OPTION) {
+                    for (File f : ff) {
+                        f.delete();
+                    }
+                    reloadStats();
+                }
+            }
+        });
 
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(bothPannels, BorderLayout.CENTER);
@@ -461,6 +509,33 @@ public class SettingsDialogue extends JDialog {
         iterationsModLabel.setText("  - Iterations modifier");
         settings.add(iterationsModLabel);
         settings.add(iterationsSpinner);
+        
+        settings.add(singleExerciseOverrideLabel);
+        settings.add(singleExerciseOverride);
+        singleExerciseOverride.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                act();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                act();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                act();
+            }
+
+            private void act() {
+                Settings.getSettings().setSingleExerciseOverride(singleExerciseOverride.getText());
+                singleExerciseParsed.setText(ExerciseOverrides.fakeFromString(Settings.getSettings().getSingleExerciseOverride()).format());
+            }
+        });
+        singleExerciseOverride.setText(Settings.getSettings().getSingleExerciseOverride());
+        settings.add(singleExerciseParsed);
 
         appearence.add(colorsInfo);
         appearence.add(trainingDelimiterSizeLabel);
@@ -617,7 +692,7 @@ public class SettingsDialogue extends JDialog {
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         try {
-              if (src2 != null) {
+            if (src2 != null) {
                 File f = src2.export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
                 if (Desktop.isDesktopSupported()) {
                     Desktop.getDesktop().browse(f.toURI());
@@ -770,7 +845,9 @@ public class SettingsDialogue extends JDialog {
         cycCheck.setText(SwingTranslator.R("mainTabCycles"));
         exDel.setText(SwingTranslator.R("delete"));
         trDel.setText(SwingTranslator.R("delete"));
-        cycDel.setText("clean (ask if sure)");
+        cycDel.setText(SwingTranslator.R("delete"));
+
+        singleExerciseOverrideLabel.setText(SwingTranslator.R("singleTrainingOverride"));;
 
         pack();
     }
@@ -845,6 +922,10 @@ public class SettingsDialogue extends JDialog {
         cycDel = new JButton("");
         trDel = new JButton("");
         exDel = new JButton("");
+
+        singleExerciseOverride = new JTextField();
+        singleExerciseOverrideLabel = new JLabel();
+        singleExerciseParsed = new JLabel();
 
     }
 
