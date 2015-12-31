@@ -145,7 +145,7 @@ public class TraningWindow extends javax.swing.JDialog {
                         ((BgLabel) timer).setSrcs(ip.getSrcs());
                         ((BgLabel) timer).setSelcted(ip.getSelcted());
                     }
-                    SoundProvider.getInstance().getPStrainingEnd().playAsync();
+                    BasicTime.payEnd();
                 } else {
                     time.play();
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
