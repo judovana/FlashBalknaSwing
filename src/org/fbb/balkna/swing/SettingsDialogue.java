@@ -191,7 +191,7 @@ public class SettingsDialogue extends JDialog {
     }
 
     private void prepare() {
-        jComboBox1.setModel(new DefaultComboBoxModel(Packages.SOUND_PACKS));
+        jComboBox1.setModel(new DefaultComboBoxModel(Packages.SOUND_PACKS()));
         jComboBox1.setSelectedItem(SoundProvider.getInstance().getUsedSoundPack());
         if (src1 == null && src2 == null) {
             exportButton.setEnabled(false);

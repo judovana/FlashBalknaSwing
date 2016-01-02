@@ -136,7 +136,7 @@ public class Commander {
         }
         if (s.toLowerCase().startsWith("sound")) {
             System.out.println(SwingTranslator.R("TuiSoundInfo1"));
-            String[] ls = Packages.SOUND_PACKS;
+            String[] ls = Packages.SOUND_PACKS();
             for (String l1 : ls) {
                 System.out.println("  " + l1);
             }
