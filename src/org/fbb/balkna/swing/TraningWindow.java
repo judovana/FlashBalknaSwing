@@ -24,15 +24,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
 import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.PausaTime;
+import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
-import org.fbb.balkna.model.primitives.history.Record;
 import org.fbb.balkna.model.utils.TimeUtils;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 
@@ -50,10 +49,11 @@ public class TraningWindow extends javax.swing.JDialog {
     Runnable oneTenthOfSecondListener;
     Runnable secondListener;
     private final Training src;
+    private final Cycle src2;
     private int skipps;
 
-    TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src) {
-        super(parent, src.getName(), modal);
+    TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src, Cycle src2) {
+        super(parent, generateTitle(src, src2), modal);
         skipps = 0;
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new WindowAdapter() {
@@ -63,8 +63,16 @@ public class TraningWindow extends javax.swing.JDialog {
 
                     int a = JOptionPane.showConfirmDialog(TraningWindow.this, SwingTranslator.R("AndroidBackTraining"));
                     if (a == JOptionPane.YES_OPTION) {
-                        src.canceled();
-                        model.getCurrent().getOriginator().getOriginal().canceled();
+                        try {
+                            src.canceled(" missing " + getRemainingTime() + " on " + jList1.getSelectedIndex() + " - " + model.getCurrent().getOriginator().getOriginal().getName() + src2ToString());
+                        } catch (Exception ex) {
+                            src.canceled(ex.toString());
+                        }
+                        try {
+                            model.getCurrent().getOriginator().getOriginal().canceled(" at " + TimeUtils.secondsToHours(model.getCurrent().getCurrentValue()) + " during " + generateTitle());
+                        } catch (Exception ex) {
+                            model.getCurrent().getOriginator().getOriginal().canceled(ex.toString());
+                        }
                         TraningWindow.this.dispose();
                     }
                 } else {
@@ -75,6 +83,7 @@ public class TraningWindow extends javax.swing.JDialog {
         });
         TraningWindow.hack = this;
         this.src = src;
+        this.src2 = src2;
         this.addWindowListener(new WindowAdapter() {
 
             @Override
@@ -132,11 +141,15 @@ public class TraningWindow extends javax.swing.JDialog {
                 BasicTime time = model.getCurrent();
                 Exercise currentExercise = time.getOriginator().getOriginal();
                 if (model.isEnded()) {
-                    currentExercise.finished();
-                    if (skipps==0){
-                        src.finished();
+                    try {
+                        currentExercise.finished("during " + generateTitle());
+                    } catch (Exception ex) {
+                        currentExercise.finished(ex.toString());
+                    }
+                    if (skipps == 0) {
+                        src.finished(null);
                     } else {
-                        src.finishedWithSkips();
+                        src.finishedWithSkips(" skipps " + skipps + " during " + generateTitle());
                     }
                     pauseRestInfoLabel.setText(time.getEndMssage());
                     ip.resetSrcs();
@@ -151,7 +164,7 @@ public class TraningWindow extends javax.swing.JDialog {
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
                     if (time instanceof PausaTime) {
                         ((BgLabel) timer).cross(true);
-                        currentExercise.finished();
+                        currentExercise.finished("for " + generateTitle());
                         nowNextLAbel.setText(model.next());
                         BasicTime ntime = model.getNext();
                         Exercise nextTime = ntime.getOriginator().getOriginal();
@@ -174,7 +187,7 @@ public class TraningWindow extends javax.swing.JDialog {
                         }
 
                     } else {
-                        currentExercise.started();
+                        currentExercise.started("for " + generateTitle());
                         ((BgLabel) timer).cross(false);
                         nowNextLAbel.setText(model.now());
                         List<BufferedImage> l = ImgUtils.getExerciseImages(currentExercise, ip.getWidth(), ip.getHeight());
@@ -217,7 +230,7 @@ public class TraningWindow extends javax.swing.JDialog {
             public void run() {
                 BasicTime c = model.getCurrent();
                 c.soundLogicRuntime(model);
-                final String s = TimeUtils.secondsToHours(c.getCurrentValue() + model.getFutureTime()) + "/" + TimeUtils.secondsToHours(model.getTotalTime());
+                final String s = getRemainingTime(c);
                 //System.out.println(s);
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -453,10 +466,10 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
-        if (!(model.getCurrent() instanceof  PausaTime)){
-            skipps ++;
+        if (!(model.getCurrent() instanceof PausaTime)) {
+            skipps++;
         }
-        model.getCurrent().getOriginator().getOriginal().canceled();
+        cancelEx();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
         model.skipForward();
@@ -479,10 +492,10 @@ public class TraningWindow extends javax.swing.JDialog {
         if (!Model.getModel().isAllowSkipping()) {
             return;
         }
-        if (!(model.getCurrent() instanceof  PausaTime)){
-            skipps --;
+        if (!(model.getCurrent() instanceof PausaTime)) {
+            skipps--;
         }
-        model.getCurrent().getOriginator().getOriginal().canceled();
+        cancelEx();
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
         model.jumpBack();
@@ -620,6 +633,38 @@ public class TraningWindow extends javax.swing.JDialog {
         timer.setHorizontalAlignment(ali);
         timer.setHorizontalTextPosition(ali);
 
+    }
+
+    private static String src2ToString(Cycle src2) {
+        return (src2 == null ? "" : " - " + src2.getName());
+    }
+
+    private String src2ToString() {
+        return src2ToString(src2);
+    }
+
+    private String generateTitle() {
+        return generateTitle(src, src2);
+    }
+
+    private static String generateTitle(Training src, Cycle src2) {
+        return src.getName() + src2ToString(src2);
+    }
+
+    private void cancelEx() {
+        try {
+            model.getCurrent().getOriginator().getOriginal().canceled(" missing " + getRemainingTime() + " during " + generateTitle() + ", skipps: " + skipps);
+        } catch (Exception ex) {
+            model.getCurrent().getOriginator().getOriginal().canceled(ex.toString());
+        }
+    }
+
+    private String getRemainingTime(BasicTime c) {
+        return TimeUtils.getRemainingTime(c, model);
+    }
+
+    private String getRemainingTime() {
+        return getRemainingTime(model.getCurrent());
     }
 
 }

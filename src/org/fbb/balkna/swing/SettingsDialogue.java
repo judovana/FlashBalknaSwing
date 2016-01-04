@@ -46,6 +46,7 @@ import org.fbb.balkna.model.primitives.ExerciseOverrides;
 import org.fbb.balkna.model.primitives.Exercises;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.primitives.Trainings;
+import org.fbb.balkna.model.primitives.history.Record;
 import org.fbb.balkna.model.primitives.history.RecordWithOrigin;
 import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
@@ -125,6 +126,7 @@ public class SettingsDialogue extends JDialog {
     private JLabel singleExerciseOverrideLabel;
     private JTextField singleExerciseOverride;
     private JLabel singleExerciseParsed;
+    private JCheckBox messages;
 
     private final Training src1;
     private final Cycle src2;
@@ -220,7 +222,7 @@ public class SettingsDialogue extends JDialog {
         stats.setLayout(new BorderLayout());
         JScrollPane jsp = new JScrollPane(statisticList);
         stats.add(jsp);
-        JPanel jpp = new JPanel(new GridLayout(2, 3));
+        JPanel jpp = new JPanel(new GridLayout(2, 4));
         stats.add(jpp, BorderLayout.SOUTH);
         ActionListener al = new ActionListener() {
 
@@ -235,9 +237,21 @@ public class SettingsDialogue extends JDialog {
         jpp.add(exCheck);
         jpp.add(trCheck);
         jpp.add(cycCheck);
+        jpp.add(new JLabel()); //aligning
+
+        messages.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Record.SHOW_MESSAGE = messages.isSelected();
+                reloadStats();
+            }
+        });
+
         jpp.add(exDel);
         jpp.add(trDel);
         jpp.add(cycDel);
+        jpp.add(messages);
 
         exDel.addActionListener(new ActionListener() {
 
@@ -315,11 +329,11 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(mute);
-        
+
         playLongTermSounds.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                  Settings.getSettings().setPlayLongTermSounds(playLongTermSounds.isSelected());
+                Settings.getSettings().setPlayLongTermSounds(playLongTermSounds.isSelected());
             }
         });
         settings.add(playLongTermSounds);
@@ -522,7 +536,7 @@ public class SettingsDialogue extends JDialog {
         });
         singleExerciseOverride.setText(Settings.getSettings().getSingleExerciseOverride());
         settings.add(singleExerciseParsed);
-        
+
         exercisesModLabel.setText("Exercise modifiers:");
         settings.add(exercisesModLabel);
 
@@ -541,7 +555,7 @@ public class SettingsDialogue extends JDialog {
         iterationsModLabel.setText("  - Iterations modifier");
         settings.add(iterationsModLabel);
         settings.add(iterationsSpinner);
-        
+
         appearence.add(colorsInfo);
         appearence.add(trainingDelimiterSizeLabel);
         appearence.add(trainingDelimiterSize);
@@ -853,6 +867,8 @@ public class SettingsDialogue extends JDialog {
         cycDel.setText(SwingTranslator.R("delete"));
         playLongTermSounds.setText(SwingTranslator.R("playLongTermSounds"));
 
+        messages.setText(SwingTranslator.R("messages"));
+
         singleExerciseOverrideLabel.setText(SwingTranslator.R("singleTrainingOverride"));;
 
         pack();
@@ -933,6 +949,8 @@ public class SettingsDialogue extends JDialog {
         singleExerciseOverride = new JTextField();
         singleExerciseOverrideLabel = new JLabel();
         singleExerciseParsed = new JLabel();
+
+        messages = new JCheckBox("", Record.SHOW_MESSAGE);
 
     }
 

@@ -297,6 +297,13 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void mdfc(Cycle c, int i) {
+        if (i != c.getTrainingPointer()) {
+            c.modified(" pointer changed  from " + i + " to " + c.getTrainingPointer()+". So training "+c.getTraining(i).getName()+" to "+c.getTraining().getName());
+        }
+    }
+
     private static class TrainingWithCycle {
 
         final Cycle c;
@@ -314,7 +321,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     }
 
-     TrainingWithCycle getSelectedTraining() {
+    TrainingWithCycle getSelectedTraining() {
         if (jTabbedPane1.getSelectedIndex() == 1) {
             if (trainingsList.getSelectedValue() != null) {
                 Training t = (Training) trainingsList.getSelectedValue();
@@ -340,14 +347,16 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
         TrainingWithCycle t = getSelectedTraining();
+        String message = "";
         if (t != null) {
             if (t.c != null) {
                 t.c.startCyclesTraining();
+                message = "as part of " + t.c.getName();
             }
             List<BasicTime> l = t.t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             l.add(0, Model.getModel().getWarmUp());
-            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t);
-            t.t.started();
+            TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t, t.c);
+            t.t.started(message);
             deselect();
             traningWindow.setVisible(true);
         }
@@ -383,8 +392,9 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         // TODO add your handling code here:
         TrainingWithCycle tc = getSelectedTraining();
         if (tc != null && tc.c != null) {
+            int i = tc.c.getTrainingPointer();
             tc.c.decTrainingPointer();
-            tc.c.modified();
+            mdfc(tc.c, i);
             selectCycle();
         }
     }//GEN-LAST:event_trainingBackActionPerformed
@@ -392,8 +402,9 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     private void trainingForwardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trainingForwardActionPerformed
         TrainingWithCycle tc = getSelectedTraining();
         if (tc != null && tc.c != null) {
+            int i = tc.c.getTrainingPointer();
             tc.c.incTrainingPointer();
-            tc.c.modified();
+            mdfc(tc.c, i);
             selectCycle();
         }
     }//GEN-LAST:event_trainingForwardActionPerformed
@@ -593,11 +604,11 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         trainingForward.setText(SwingTranslator.R("trainingFwd"));
         currentTraining.setText(SwingTranslator.R("trainingCurrent", "?"));
 
-        try{
-        jTabbedPane1.setTitleAt(0, (SwingTranslator.R("mainTabExercise")));
-        jTabbedPane1.setTitleAt(1, (SwingTranslator.R("mainTabTrainings")));
-        jTabbedPane1.setTitleAt(2, (SwingTranslator.R("mainTabCycles")));
-        }catch (Exception ex){
+        try {
+            jTabbedPane1.setTitleAt(0, (SwingTranslator.R("mainTabExercise")));
+            jTabbedPane1.setTitleAt(1, (SwingTranslator.R("mainTabTrainings")));
+            jTabbedPane1.setTitleAt(2, (SwingTranslator.R("mainTabCycles")));
+        } catch (Exception ex) {
             // set locales is called from jTabbedPane1  stateChanged
         }
     }

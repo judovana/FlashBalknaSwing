@@ -96,13 +96,13 @@ class TuiTraining {
 
             private void bigInfo1(BasicTime time) {
                 BasicTime c = model.getCurrent();
-                final String s = TimeUtils.secondsToHours(c.getCurrentValue() + model.getFutureTime()) + "/" + TimeUtils.secondsToHours(model.getTotalTime());
+                final String s = getRemainingTime(c);
                 System.out.println(time.getInformaiveTitle() + " " + s);
             }
 
             private void bigInfo2() {
                 BasicTime c = model.getCurrent();
-                final String s = TimeUtils.secondsToHours(c.getCurrentValue() + model.getFutureTime()) + "/" + TimeUtils.secondsToHours(model.getTotalTime());
+                final String s = getRemainingTime(c);
                 System.out.println(model.now() + " " + s);
             }
 
@@ -216,4 +216,7 @@ class TuiTraining {
         Model.getModel().setLaud(was);
     }
 
+    private String getRemainingTime(BasicTime c) {
+        return TimeUtils.getRemainingTime(c, model);
+    }
 }
