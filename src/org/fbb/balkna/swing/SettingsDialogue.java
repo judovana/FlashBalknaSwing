@@ -496,25 +496,6 @@ public class SettingsDialogue extends JDialog {
         });
         settings.add(localPlugin);
 
-        exercisesModLabel.setText("Exercise modifiers:");
-        settings.add(exercisesModLabel);
-
-        trainingsModLabel.setText("  - Training times modifier:");
-        settings.add(trainingsModLabel);
-        settings.add(trainingsSpinner);
-
-        pausesModLabel.setText("  - Pause times modifier:");
-        settings.add(pausesModLabel);
-        settings.add(pausesSpinner);
-
-        restsModLabel.setText("  - Rest times modifier:");
-        settings.add(restsModLabel);
-        settings.add(restsSpinner);
-
-        iterationsModLabel.setText("  - Iterations modifier");
-        settings.add(iterationsModLabel);
-        settings.add(iterationsSpinner);
-        
         settings.add(singleExerciseOverrideLabel);
         settings.add(singleExerciseOverride);
         singleExerciseOverride.getDocument().addDocumentListener(new DocumentListener() {
@@ -541,7 +522,26 @@ public class SettingsDialogue extends JDialog {
         });
         singleExerciseOverride.setText(Settings.getSettings().getSingleExerciseOverride());
         settings.add(singleExerciseParsed);
+        
+        exercisesModLabel.setText("Exercise modifiers:");
+        settings.add(exercisesModLabel);
 
+        trainingsModLabel.setText("  - Training times modifier:");
+        settings.add(trainingsModLabel);
+        settings.add(trainingsSpinner);
+
+        pausesModLabel.setText("  - Pause times modifier:");
+        settings.add(pausesModLabel);
+        settings.add(pausesSpinner);
+
+        restsModLabel.setText("  - Rest times modifier:");
+        settings.add(restsModLabel);
+        settings.add(restsSpinner);
+
+        iterationsModLabel.setText("  - Iterations modifier");
+        settings.add(iterationsModLabel);
+        settings.add(iterationsSpinner);
+        
         appearence.add(colorsInfo);
         appearence.add(trainingDelimiterSizeLabel);
         appearence.add(trainingDelimiterSize);
