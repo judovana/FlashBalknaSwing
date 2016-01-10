@@ -521,6 +521,7 @@ public class TraningWindow extends javax.swing.JDialog {
 
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
     public static void main(String args[]) throws IOException {
 
@@ -583,14 +584,14 @@ public class TraningWindow extends javax.swing.JDialog {
     private javax.swing.JPanel timerPanel;
     // End of variables declaration//GEN-END:variables
 
-    void setLocales() {
+    final void setLocales() {
         skipButton.setText(SwingTranslator.R("skipForward"));
         backButton.setText(SwingTranslator.R("jumpBack"));
         this.setTitle(src.getName());
         // not localised because of logic
         //startButton.setText(SwingTranslator.R("Start"));
         validate();
-        repaint();;
+        repaint();
     }
 
     private void setTimerFont(int nvalue) {
@@ -602,7 +603,7 @@ public class TraningWindow extends javax.swing.JDialog {
         }
     }
 
-    void setTimerFont() {
+    final void setTimerFont() {
         int nvalue = Settings.getSettings().getMainTimerSize();
         if (nvalue == 0) {
             setTimerFont(36);
