@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import javax.imageio.ImageIO;
 import org.fbb.balkna.Packages;
+import org.fbb.balkna.model.Exportable;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
@@ -155,7 +156,7 @@ public class ImgUtils {
         }
     }
 
-    public static List<BufferedImage> getTrainingImages(Training t, int targetW, int targetH) {
+    public static List<BufferedImage> getTrainingImages(Exportable t, int targetW, int targetH) {
         List<BufferedImage> r = getImages(Packages.IMAGES_TRA, t.getImages());
         List<BufferedImage> r2 = getImages(Packages.IMAGES_EXE, t.getExerciseImages());
         if (r == null) {

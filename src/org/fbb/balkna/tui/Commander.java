@@ -1,25 +1,17 @@
 package org.fbb.balkna.tui;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import org.fbb.balkna.Packages;
-import org.fbb.balkna.awt.utils.ImagesSaverImpl;
-import org.fbb.balkna.awt.utils.ImgUtils;
 import org.fbb.balkna.model.Model;
-import org.fbb.balkna.model.settings.Settings;
-import org.fbb.balkna.model.SoundProvider;
-import org.fbb.balkna.model.Translator;
+import org.fbb.balkna.model.Trainable;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
+import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
-import org.fbb.balkna.swing.FlashBoulderBalkna;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
 import org.fbb.balkna.swing.locales.SwingTranslator;
-import org.judovana.linux.ConsoleImageViewer;
 
 /**
  *
@@ -27,142 +19,99 @@ import org.judovana.linux.ConsoleImageViewer;
  */
 public class Commander {
 
-    static boolean processCommands(BufferedReader br) throws NumberFormatException, IOException {
-        List<Training> l = Model.getModel().getTraingNames();
-        printInfo(l);
-        String s = br.readLine().trim();
-        return processCommand(s, l);
+    private static List<String> history = new ArrayList<String>();
+
+    private static enum Current {
+
+        EXRCS, TRAINS, CYCLS
     }
 
-    private static void printInfo(List<Training> l) {
-        System.out.println(SwingTranslator.R("TuiMainCommands20"));
-        System.out.println(SwingTranslator.R("TuiMainCommands10"));
-        System.out.println(SwingTranslator.R("TuiMainCommands9"));
-        System.out.println(SwingTranslator.R("TuiMainCommands8", configDir));
-        System.out.println(SwingTranslator.R("TuiMainCommands7"));
-        System.out.println(SwingTranslator.R("TuiMainCommands6", configDir));
-        System.out.println(SwingTranslator.R("TuiMainCommands5"));
-        System.out.println(SwingTranslator.R("TuiMainCommands4"));
-        System.out.println(SwingTranslator.R("TuiMainCommands3"));
-        System.out.println(SwingTranslator.R("TuiMainCommands2"));
-        System.out.println(SwingTranslator.R("TuiMainCommands12"));
-        System.out.println(SwingTranslator.R("TuiMainCommands11"));
-        System.out.println(SwingTranslator.R("TuiMainCommands1"));
+    private static Current current = Current.TRAINS;
+
+    private static String s = "";
+
+    static boolean processCommands(BufferedReader br) throws NumberFormatException, IOException {
+        List<Trainable> l = new ArrayList<Trainable>(0);
+        if (current == Current.TRAINS) {
+            l.addAll(Model.getModel().getTraingNames());
+        }
+        if (current == Current.EXRCS) {
+            List<Exercise> q = Model.getModel().getExercises();
+            for (Exercise ex : q) {
+                l.add(new Training(ex));
+            }
+        }
+        if (current == Current.CYCLS) {
+            l.addAll(Model.getModel().getCycles());
+        }
+        if (!isHistory(s)) {
+            printInfo(l);
+        }
+        s = br.readLine().trim();
+        boolean r = processCommand(s, l);
+        hhhh(s);
+        return r;
+    }
+
+    private static void printInfo(List<Trainable> l) {
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands20"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands10"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands9"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands8", configDir));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands7"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands6", configDir));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands5"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands102"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands101"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands4"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands3"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands100"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands2"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands12"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands11"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands1"));
         for (int i = 0; i < l.size(); i++) {
-            System.out.println(i + 1 + ") " + l.get(i).getName());
+            if (current == Current.CYCLS) {
+                Trainable c = l.get(i);
+                String q = SwingTranslator.R("trainingCurrent", c.getTrainingPointer() + " - " + c.getTraining().getName());
+                System.out.println(i + 1 + ") " + c.getName() + "; " + q);
+            } else {
+                System.out.println(i + 1 + ") " + l.get(i).getName());
+            }
 
         }
     }
 
-    private static boolean processCommand(String s, List<Training> l) throws IOException, NumberFormatException {
+    private static boolean processCommand(String s, List<Trainable> l) throws IOException, NumberFormatException {
         if (s.equalsIgnoreCase("exit") || s.equalsIgnoreCase("quit")) {
             return true;
         }
-        if (s.toLowerCase().startsWith("info ")) {
-            int i = getIdFromCommand(s);
-            if (TuiMain.globalImages) {
-                List<BufferedImage> imgs = ImgUtils.getTrainingImages(l.get(i), ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
-                int index = 0;
-                if (imgs.size() > 1) {
-                    index = 1;
-                }
-                ConsoleImageViewer.doJob(imgs.get(index));
-            }
-            System.out.println(l.get(i).getStory());
-        }
-        if (s.toLowerCase().startsWith("images ")) {
-            if (!TuiMain.globalImages) {
-                System.out.println(SwingTranslator.R("TuiImagesDissabled"));
-            }
-            int i = getIdFromCommand(s);
-            List<BufferedImage> imgs = ImgUtils.getTrainingImages(l.get(i), ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
-            int index = 0;
-            if (imgs.size() > 1) {
-                index = 1;
-            }
-            if (imgs.size() > 2) {
-                index = 2;
-            }
-            for (int x = index; x < imgs.size(); x++) {
-                ConsoleImageViewer.doJob(imgs.get(x));
-            }
 
-        }
-        if (s.toLowerCase().startsWith("get ")) {
-            try {
-                Model.getModel().reload(false, new URL(s.split("\\s+")[1]));
-                System.out.println("OK");
-                System.out.println("");
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
+        SimpleCommand.proceed(s, l);
 
-        }
-        if (s.equalsIgnoreCase("properties")) {
-            String[] ss = Settings.getSettings().listItems();
-            System.out.println("********************");
-            for (String s1 : ss) {
-                System.out.println(s1);
-            }
-            System.out.println("********************");
-        }
-        if (s.toLowerCase().startsWith("set ")) {
-            String s1 = s.split("\\s+")[1];
-            String[] s2 = s1.split("=");
-            String key = s2[0];
-            String value = "";
-            if (s2.length > 1) {
-                value = s2[1].trim();
-            }
-            if (value.equals("null")) {
-                value = null;
-            }
-            Settings.getSettings().readItem(key, value);
-            if (TuiMain.globalSounds) {
-                SoundProvider.getInstance().load(Settings.getSettings().getForcedSoundFont());
-            }
-            Translator.load(Settings.getSettings().getForcedLanguage());
-            SwingTranslator.load(Settings.getSettings().getForcedLanguage());
-            System.out.println("OK");
-            System.out.println("");
-
-        }
-
-        if (s.equalsIgnoreCase("save")) {
-            Model.getModel().save();
-            System.out.println("OK");
-            System.out.println("");
-
-        }
-        if (s.toLowerCase().startsWith("sound")) {
-            System.out.println(SwingTranslator.R("TuiSoundInfo1"));
-            String[] ls = Packages.SOUND_PACKS();
-            for (String l1 : ls) {
-                System.out.println("  " + l1);
-            }
-            if (!TuiMain.globalSounds) {
-                System.out.println(SwingTranslator.R("TuiSoundDissabled"));
-            }
-            String[] isPack = s.split("\\s+");
-            if (isPack.length == 1) {
-                System.out.println(SwingTranslator.R("TuiSoundInfo2", SoundProvider.getInstance().getUsedSoundPack()));
-                SoundProvider.getInstance().test();
+        if (isHistory(s)) {
+            if (s.equals("hh")) {
+                System.out.println(history.get(0));
+            } else if (s.contains(" ")) {
+                System.out.println(history.get(getIdFromCommand(s) + 1));
             } else {
-                System.out.println(SwingTranslator.R("TuiSoundInfo2", isPack[1]));
-                SoundProvider.getInstance().test(isPack[1]);
-
+                for (int i = history.size() - 1; i >= 0; i--) {
+                    String ss = history.get(i);
+                    System.out.println(i + ") " + ss);
+                }
             }
-
         }
-        if (s.toLowerCase().startsWith("export ")) {
-            int i = getIdFromCommand(s);
-            if (!TuiMain.globalImages) {
-                System.out.println(SwingTranslator.R("TuiImagesDissabled"));
-            }
-            File f = l.get(i).export(FlashBoulderBalkna.exportDir, new ImagesSaverImpl());
-            System.out.println("Exported: " + f.getAbsolutePath());
-            System.out.println("");
 
+        if (s.equals("trainings")) {
+            current = Current.TRAINS;
+        }
+
+        if (s.equals("cycles")) {
+            current = Current.CYCLS;
+        }
+
+        if (s.equals("exercises")) {
+            current = Current.EXRCS;
         }
 
         if (s.toLowerCase().startsWith("train ")) {
@@ -174,7 +123,7 @@ public class Commander {
                 Model.getModel().getTimeShift().setRest(new Double(isShift[4].trim()));
                 Model.getModel().getTimeShift().setIterations(new Double(isShift[5].trim()));
             }
-            Training t = l.get(i);
+            Training t = l.get(i).getTraining();
             List<BasicTime> br = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             br.add(0, Model.getModel().getWarmUp());
             new TuiTraining(t, new MainTimer(br)).start();
@@ -193,4 +142,24 @@ public class Commander {
         int i = new Integer(s.split("\\s+")[1]);
         return i - 1;
     }
+
+    private static boolean isHistory(String s) {
+        return s.toLowerCase().startsWith("history") || s.toLowerCase().equals("h") || s.toLowerCase().equals("hh") || s.toLowerCase().startsWith("h ");
+    }
+
+    private static void hhhh(String s) {
+        if (s == null || s.isEmpty() || isHistory(s)) {
+            return;
+        }
+        if (history.isEmpty()) {
+            history.add(s);
+        } else {
+            if (history.get(0).equals(s)) {
+
+            } else {
+                history.add(0, s);
+            }
+        }
+    }
+
 }
