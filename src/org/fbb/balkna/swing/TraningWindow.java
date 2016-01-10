@@ -158,7 +158,7 @@ public class TraningWindow extends javax.swing.JDialog {
                         ((BgLabel) timer).setSrcs(ip.getSrcs());
                         ((BgLabel) timer).setSelcted(ip.getSelcted());
                     }
-                    BasicTime.payEnd();
+                    BasicTime.playEnd();
                 } else {
                     time.play();
                     pauseRestInfoLabel.setText(time.getInformaiveTitle());
@@ -648,7 +648,7 @@ public class TraningWindow extends javax.swing.JDialog {
         return generateTitle(src, src2);
     }
 
-    private static String generateTitle(Training src, Cycle src2) {
+    public static String generateTitle(Training src, Cycle src2) {
         return src.getName() + src2ToString(src2);
     }
 

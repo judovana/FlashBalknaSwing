@@ -15,9 +15,11 @@ import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BigRestTime;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.PausaTime;
+import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.utils.TimeUtils;
+import org.fbb.balkna.swing.TraningWindow;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.judovana.linux.ConsoleImageViewer;
 
@@ -31,9 +33,23 @@ class TuiTraining {
     Runnable exercseShiftedLIstener;
     Runnable secondListener;
     BufferedReader br;
+    private final Training training;
+    private final Cycle cycle;
+    private final Thread hook;
 
-    public TuiTraining(Training t, MainTimer timer) {
+    public TuiTraining(Training t, Cycle c, MainTimer timer) {
         model = timer;
+        this.training = t;
+        hook = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                training.canceled(generateTitle());
+                model.getCurrent().getOriginator().getOriginal().canceled(" at " + TimeUtils.secondsToHours(model.getCurrent().getCurrentValue()));
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(hook);
+        this.cycle = c;
         this.br = new BufferedReader(new InputStreamReader(System.in));
         exercseShiftedLIstener = new Runnable() {
 
@@ -45,11 +61,14 @@ class TuiTraining {
                         ConsoleImageViewer.doJob(ImgUtils.getDefaultImage());
                     }
                     System.out.println(time.getEndMssage());
-                    BasicTime.payEnd();
+                    BasicTime.playEnd();
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                     }
+                    Runtime.getRuntime().removeShutdownHook(hook);
+                    model.getCurrent().getOriginator().getOriginal().finished(generateTitle());
+                    training.finished(generateTitle());
                     System.exit(0);
 
                 } else {
@@ -57,6 +76,7 @@ class TuiTraining {
                         time.play();
                     }
                     if (time instanceof PausaTime) {
+                        model.getCurrent().getOriginator().getOriginal().finished(generateTitle());
                         BasicTime ntime = model.getNext();
                         Exercise t = ntime.getOriginator().getOriginal();
                         List l = null;
@@ -80,7 +100,7 @@ class TuiTraining {
 
                     } else {
                         Exercise t = time.getOriginator().getOriginal();
-
+                        model.getCurrent().getOriginator().getOriginal().started(generateTitle());
                         if (TuiMain.globalImages) {
                             List l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
                             ConsoleImageViewer.doJob((BufferedImage) l.get(0));
@@ -218,5 +238,9 @@ class TuiTraining {
 
     private String getRemainingTime(BasicTime c) {
         return TimeUtils.getRemainingTime(c, model);
+    }
+    
+    private String generateTitle() {
+        return " tui " + TraningWindow.generateTitle(training, cycle);
     }
 }

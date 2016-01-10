@@ -8,6 +8,7 @@ import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.Trainable;
 import org.fbb.balkna.model.merged.uncompressed.MainTimer;
 import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
+import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
@@ -73,7 +74,7 @@ public class Commander {
         for (int i = 0; i < l.size(); i++) {
             if (current == Current.CYCLS) {
                 Trainable c = l.get(i);
-                String q = SwingTranslator.R("trainingCurrent", c.getTrainingPointer() + " - " + c.getTraining().getName());
+                String q = SwingTranslator.R("trainingCurrent", c.getCycle().getTrainingPointer() + " - " + c.getTraining().getName());
                 System.out.println(i + 1 + ") " + c.getName() + "; " + q);
             } else {
                 System.out.println(i + 1 + ") " + l.get(i).getName());
@@ -124,9 +125,17 @@ public class Commander {
                 Model.getModel().getTimeShift().setIterations(new Double(isShift[5].trim()));
             }
             Training t = l.get(i).getTraining();
+            Cycle c = null;
+            String message = "tui";
+            if (current == Current.CYCLS) {
+                c = l.get(i).getCycle();
+                message +=" in "+c.getTrainingPointer()+" - "+c.getName();
+                c.startCyclesTraining();
+            }
+            t.started(message);
             List<BasicTime> br = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             br.add(0, Model.getModel().getWarmUp());
-            new TuiTraining(t, new MainTimer(br)).start();
+            new TuiTraining(t, c, new MainTimer(br)).start();
             while (true) {
                 try {
                     Thread.sleep(1000);
