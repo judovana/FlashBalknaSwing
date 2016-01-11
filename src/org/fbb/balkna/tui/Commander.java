@@ -11,6 +11,7 @@ import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.history.StatisticHelper;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 
@@ -126,13 +127,11 @@ public class Commander {
             }
             Training t = l.get(i).getTraining();
             Cycle c = null;
-            String message = "tui";
             if (current == Current.CYCLS) {
                 c = l.get(i).getCycle();
-                message +=" in "+c.getTrainingPointer()+" - "+c.getName();
                 c.startCyclesTraining();
             }
-            t.started(message);
+            t.getStatsHelper().started(StatisticHelper.generateMessage(c, t, (Exercise)null));
             List<BasicTime> br = t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             br.add(0, Model.getModel().getWarmUp());
             new TuiTraining(t, c, new MainTimer(br)).start();

@@ -18,6 +18,7 @@ import org.fbb.balkna.model.merged.uncompressed.timeUnits.PausaTime;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.history.StatisticHelper;
 import org.fbb.balkna.model.utils.TimeUtils;
 import org.fbb.balkna.swing.TraningWindow;
 import org.fbb.balkna.swing.locales.SwingTranslator;
@@ -44,8 +45,8 @@ class TuiTraining {
 
             @Override
             public void run() {
-                training.canceled(generateTitle());
-                model.getCurrent().getOriginator().getOriginal().canceled(" at " + TimeUtils.secondsToHours(model.getCurrent().getCurrentValue()));
+                training.getStatsHelper().canceled(StatisticHelper.generateMessage(cycle, training, model));
+                model.getCurrent().getOriginator().getOriginal().getStatsHelper().canceled(StatisticHelper.generateMessage(cycle, training, model));
             }
         });
         Runtime.getRuntime().addShutdownHook(hook);
@@ -67,8 +68,12 @@ class TuiTraining {
                     } catch (InterruptedException e) {
                     }
                     Runtime.getRuntime().removeShutdownHook(hook);
-                    model.getCurrent().getOriginator().getOriginal().finished(generateTitle());
-                    training.finished(generateTitle());
+                    model.getCurrent().getOriginator().getOriginal().getStatsHelper().finished(StatisticHelper.generateMessage(cycle, training, model));
+                    if (model.wasSkipped()){
+                    training.getStatsHelper().finishedWithSkips(StatisticHelper.generateMessage(cycle, training, model));    
+                    } else {
+                    training.getStatsHelper().finished(StatisticHelper.generateMessage(cycle, training, model));
+                    }
                     System.exit(0);
 
                 } else {
@@ -76,7 +81,7 @@ class TuiTraining {
                         time.play();
                     }
                     if (time instanceof PausaTime) {
-                        model.getCurrent().getOriginator().getOriginal().finished(generateTitle());
+                        model.getCurrent().getOriginator().getOriginal().getStatsHelper().finished(StatisticHelper.generateMessage(cycle, training, model));
                         BasicTime ntime = model.getNext();
                         Exercise t = ntime.getOriginator().getOriginal();
                         List l = null;
@@ -100,7 +105,7 @@ class TuiTraining {
 
                     } else {
                         Exercise t = time.getOriginator().getOriginal();
-                        model.getCurrent().getOriginator().getOriginal().started(generateTitle());
+                        model.getCurrent().getOriginator().getOriginal().getStatsHelper().started(StatisticHelper.generateMessage(cycle, training, model));
                         if (TuiMain.globalImages) {
                             List l = ImgUtils.getExerciseImages(t, ConsoleImageViewer.getW(), ConsoleImageViewer.getH());
                             ConsoleImageViewer.doJob((BufferedImage) l.get(0));
@@ -116,13 +121,13 @@ class TuiTraining {
 
             private void bigInfo1(BasicTime time) {
                 BasicTime c = model.getCurrent();
-                final String s = getRemainingTime(c);
+                final String s = TimeUtils.getRemainingTime(c, model);
                 System.out.println(time.getInformaiveTitle() + " " + s);
             }
 
             private void bigInfo2() {
                 BasicTime c = model.getCurrent();
-                final String s = getRemainingTime(c);
+                final String s = TimeUtils.getRemainingTime(c, model);
                 System.out.println(model.now() + " " + s);
             }
 
@@ -220,7 +225,7 @@ class TuiTraining {
         }
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
-        model.skipForward();
+        model.skipForward(true);
         runAllListeners();
         Model.getModel().setLaud(was);
     }
@@ -231,16 +236,9 @@ class TuiTraining {
         }
         boolean was = Model.getModel().isLaud();
         Model.getModel().setLaud(false);
-        model.jumpBack();
+        model.jumpBack(true);
         runAllListeners();
         Model.getModel().setLaud(was);
     }
 
-    private String getRemainingTime(BasicTime c) {
-        return TimeUtils.getRemainingTime(c, model);
-    }
-    
-    private String generateTitle() {
-        return " tui " + TraningWindow.generateTitle(training, cycle);
-    }
 }

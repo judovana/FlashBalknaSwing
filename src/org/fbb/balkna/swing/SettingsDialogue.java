@@ -244,7 +244,11 @@ public class SettingsDialogue extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Record.SHOW_MESSAGE = messages.isSelected();
+                int i = statisticList.getSelectedIndex();
                 reloadStats();
+                if (i>=0){
+                    statisticList.setSelectedIndex(i);
+                }
             }
         });
 

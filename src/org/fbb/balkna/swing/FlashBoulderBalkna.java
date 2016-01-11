@@ -22,6 +22,7 @@ import org.fbb.balkna.model.merged.uncompressed.timeUnits.BasicTime;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
+import org.fbb.balkna.model.primitives.history.StatisticHelper;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.fbb.balkna.tui.TuiMain;
 
@@ -347,16 +348,14 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     private void startTrainingButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startTrainingButtonActionPerformed
         TrainingWithCycle t = getSelectedTraining();
-        String message = "";
         if (t != null) {
             if (t.c != null) {
                 t.c.startCyclesTraining();
-                message = "as part of " + t.c.getName();
             }
             List<BasicTime> l = t.t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             l.add(0, Model.getModel().getWarmUp());
             TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t, t.c);
-            t.t.started(message);
+            t.t.getStatsHelper().started(StatisticHelper.generateMessage(t.c, t.t, (Exercise)null));
             deselect();
             traningWindow.setVisible(true);
         }
