@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataListener;
@@ -301,7 +302,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
     private void mdfc(Cycle c, int i) {
         if (i != c.getTrainingPointer()) {
-            c.modified(" pointer changed  from " + i + " to " + c.getTrainingPointer()+". So training "+c.getTraining(i).getName()+" to "+c.getTraining().getName());
+            c.modified(" pointer changed  from " + i + " to " + c.getTrainingPointer() + ". So training " + c.getTraining(i).getName() + " to " + c.getTraining().getName());
         }
     }
 
@@ -355,7 +356,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             List<BasicTime> l = t.t.getMergedExercises(Model.getModel().getTimeShift()).decompress();
             l.add(0, Model.getModel().getWarmUp());
             TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t, t.c);
-            t.t.getStatsHelper().started(StatisticHelper.generateMessage(t.c, t.t, (Exercise)null));
+            t.t.getStatsHelper().started(StatisticHelper.generateMessage(t.c, t.t, (Exercise) null));
             deselect();
             traningWindow.setVisible(true);
         }
@@ -378,6 +379,9 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             panelWithInfo.setLayout(new GridLayout(1, 1));
             panelWithInfo.add(textPreviewContainer);
             panelWithInfo.validate();
+            if (cyclesList.getModel().getSize() <= 0) {
+                JOptionPane.showMessageDialog(this, SwingTranslator.R("NoCyclesFound"));
+            }
         } else {
             panelWithInfo.removeAll();
             panelWithInfo.setLayout(new GridLayout(2, 1));
