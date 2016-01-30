@@ -237,7 +237,8 @@ public class SettingsDialogue extends JDialog {
         jpp.add(exCheck);
         jpp.add(trCheck);
         jpp.add(cycCheck);
-        jpp.add(new JLabel()); //aligning
+        JButton nextButton = new JButton(SwingTranslator.R("Next"));
+        jpp.add(nextButton); 
 
         messages.addActionListener(new ActionListener() {
 
