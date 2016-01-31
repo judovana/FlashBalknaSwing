@@ -136,9 +136,9 @@ public class TraningWindow extends javax.swing.JDialog {
                 if (model.isEnded()) {
                         currentExercise.getStatsHelper().finished(StatisticHelper.generateMessage(src2, src, model));
                     if (model.wasSkipped()) {
-                        src.getStatsHelper().finished(StatisticHelper.generateMessage(src2, src, model));
-                    } else {
                         src.getStatsHelper().finishedWithSkips(StatisticHelper.generateMessage(src2, src, model));
+                    } else {
+                        src.getStatsHelper().finished(StatisticHelper.generateMessage(src2, src, model));
                     }
                     pauseRestInfoLabel.setText(time.getEndMssage());
                     ip.resetSrcs();

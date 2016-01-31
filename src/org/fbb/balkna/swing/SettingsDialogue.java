@@ -967,6 +967,7 @@ public class SettingsDialogue extends JDialog {
 
             List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
 //            BufferedImage b1 = SwingGraph.generateGraph(Model.getModel().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b6 = SwingGraph.generateGraph(Model.getModel().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b2 = SwingGraph.generateGraph(Model.getModel().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b3 = SwingGraph.generateGraph(Model.getModel().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b4 = SwingGraph.generateGraph(Model.getModel().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
