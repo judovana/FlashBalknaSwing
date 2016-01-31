@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -37,6 +38,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
+import org.fbb.balkna.awt.utils.ImgUtils;
+import org.fbb.balkna.awt.utils.SwingGraph;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
@@ -963,6 +966,11 @@ public class SettingsDialogue extends JDialog {
         statisticList.setModel(new AbstractListModel() {
 
             List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
+//            BufferedImage b1 = SwingGraph.generateGraph(Model.getModel().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b2 = SwingGraph.generateGraph(Model.getModel().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b3 = SwingGraph.generateGraph(Model.getModel().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b4 = SwingGraph.generateGraph(Model.getModel().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b5 = SwingGraph.generateGraph(Model.getModel().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 
             @Override
             public int getSize() {

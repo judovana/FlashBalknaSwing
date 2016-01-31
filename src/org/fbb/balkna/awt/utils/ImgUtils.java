@@ -14,7 +14,6 @@ import org.fbb.balkna.Packages;
 import org.fbb.balkna.model.Exportable;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.primitives.Exercise;
-import org.fbb.balkna.model.primitives.Training;
 import static org.fbb.balkna.model.utils.IoUtils.getFile;
 
 /**
@@ -23,7 +22,7 @@ import static org.fbb.balkna.model.utils.IoUtils.getFile;
  */
 public class ImgUtils {
 
-    private static Map<URL, BufferedImage> cache = new HashMap<URL, BufferedImage>();
+    private static final Map<URL, BufferedImage> cache = new HashMap<URL, BufferedImage>();
 
     public static BufferedImage getImage(String subPackage, String fileName) {
         try {
@@ -188,15 +187,15 @@ public class ImgUtils {
     }
 
     public static void writeExercisesImagesToDir(File imgDir, List<String> names) throws IOException {
-     List<BufferedImage> allti = getImages(Packages.IMAGES_EXE, names);   
+        List<BufferedImage> allti = getImages(Packages.IMAGES_EXE, names);
         writeImagesToDir(imgDir, names, allti);
     }
-    
+
     public static void writeTrainingsImagesToDir(File imgDir, List<String> names) throws IOException {
-     List<BufferedImage> allti = getImages(Packages.IMAGES_TRA, names);   
+        List<BufferedImage> allti = getImages(Packages.IMAGES_TRA, names);
         writeImagesToDir(imgDir, names, allti);
     }
-    
+
     private static void writeImagesToDir(File imgDir, List<String> names, List<BufferedImage> allti) throws IOException {
         for (int i = 0; i < allti.size(); i++) {
             BufferedImage it = allti.get(i);
@@ -207,8 +206,7 @@ public class ImgUtils {
         im.createGraphics().drawImage(orig, null, null);
         ImageIO.write(im, "jpg", new File(imgDir, Model.getDefaultImageName()));
     }
-    
-    
+
     public static BufferedImage getDefaultImage() {
         return ImgUtils.getImage(Packages.IMAGES_APP, Model.getDefaultImage());
     }
