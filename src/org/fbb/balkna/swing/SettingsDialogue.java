@@ -43,6 +43,7 @@ import org.fbb.balkna.awt.utils.SwingGraph;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
+import org.fbb.balkna.model.graphs.DataProvider;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Cycles;
 import org.fbb.balkna.model.primitives.ExerciseOverrides;
@@ -966,12 +967,12 @@ public class SettingsDialogue extends JDialog {
         statisticList.setModel(new AbstractListModel() {
 
             List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
-//            BufferedImage b1 = SwingGraph.generateGraph(Model.getModel().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-//            BufferedImage b6 = SwingGraph.generateGraph(Model.getModel().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-//            BufferedImage b2 = SwingGraph.generateGraph(Model.getModel().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-//            BufferedImage b3 = SwingGraph.generateGraph(Model.getModel().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-//            BufferedImage b4 = SwingGraph.generateGraph(Model.getModel().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-//            BufferedImage b5 = SwingGraph.generateGraph(Model.getModel().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b1 = SwingGraph.generateGraph(DataProvider.getDataProvider().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b6 = SwingGraph.generateGraph(DataProvider.getDataProvider().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b2 = SwingGraph.generateGraph(DataProvider.getDataProvider().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b3 = SwingGraph.generateGraph(DataProvider.getDataProvider().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b4 = SwingGraph.generateGraph(DataProvider.getDataProvider().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b5 = SwingGraph.generateGraph(DataProvider.getDataProvider().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 
             @Override
             public int getSize() {
