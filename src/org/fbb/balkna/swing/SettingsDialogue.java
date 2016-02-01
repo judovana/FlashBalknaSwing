@@ -242,7 +242,7 @@ public class SettingsDialogue extends JDialog {
         jpp.add(trCheck);
         jpp.add(cycCheck);
         JButton nextButton = new JButton(SwingTranslator.R("Next"));
-        jpp.add(nextButton); 
+        jpp.add(nextButton);
 
         messages.addActionListener(new ActionListener() {
 
@@ -251,7 +251,7 @@ public class SettingsDialogue extends JDialog {
                 Record.SHOW_MESSAGE = messages.isSelected();
                 int i = statisticList.getSelectedIndex();
                 reloadStats();
-                if (i>=0){
+                if (i >= 0) {
                     statisticList.setSelectedIndex(i);
                 }
             }
@@ -967,12 +967,18 @@ public class SettingsDialogue extends JDialog {
         statisticList.setModel(new AbstractListModel() {
 
             List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
-            BufferedImage b1 = SwingGraph.generateGraph(DataProvider.getDataProvider().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b6 = SwingGraph.generateGraph(DataProvider.getDataProvider().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b2 = SwingGraph.generateGraph(DataProvider.getDataProvider().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b3 = SwingGraph.generateGraph(DataProvider.getDataProvider().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b4 = SwingGraph.generateGraph(DataProvider.getDataProvider().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b5 = SwingGraph.generateGraph(DataProvider.getDataProvider().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b1 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b6 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b2 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getWeekData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b3 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b4 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+//            BufferedImage b5 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
+            BufferedImage b1 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getDayTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+            BufferedImage b6 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getHourTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+            BufferedImage b2 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getWeekTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+            BufferedImage b3 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getMonthTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+            BufferedImage b4 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+            BufferedImage b5 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
 
             @Override
             public int getSize() {
@@ -983,7 +989,20 @@ public class SettingsDialogue extends JDialog {
             public Object getElementAt(int i) {
                 return data.get(i);
             }
+
+            private int getColumns() {
+                int columns = 0;
+                if (exCheck.isSelected()) {
+                    columns++;
+                }
+                if (trCheck.isSelected()) {
+                    columns++;
+                }
+                if (cycCheck.isSelected()) {
+                    columns++;
+                }
+                return columns;
+            }
         });
     }
-
 }
