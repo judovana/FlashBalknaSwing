@@ -242,6 +242,13 @@ public class SettingsDialogue extends JDialog {
         jpp.add(trCheck);
         jpp.add(cycCheck);
         JButton nextButton = new JButton(SwingTranslator.R("Next"));
+        nextButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showMessageDialog(null, "Nearly done! Will be in next update!");
+            }
+        });
         jpp.add(nextButton);
 
         messages.addActionListener(new ActionListener() {
@@ -973,12 +980,12 @@ public class SettingsDialogue extends JDialog {
 //            BufferedImage b3 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getMonthData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b4 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getYearData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b5 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getYearData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
-            BufferedImage b1 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getDayTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
-            BufferedImage b6 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getHourTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
-            BufferedImage b2 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getWeekTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
-            BufferedImage b3 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getMonthTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
-            BufferedImage b4 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
-            BufferedImage b5 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b1 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getDayTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b6 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getHourTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b2 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getWeekTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b3 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getMonthTimeData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b4 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData1(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
+//            BufferedImage b5 = SwingGraph.generateTimeGraph(DataProvider.getDataProvider().getYearTimeData2(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()), getColumns());
 
             @Override
             public int getSize() {
