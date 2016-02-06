@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
@@ -38,12 +37,9 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.fbb.balkna.Packages;
 import org.fbb.balkna.awt.utils.ImagesSaverImpl;
-import org.fbb.balkna.awt.utils.ImgUtils;
-import org.fbb.balkna.awt.utils.SwingGraph;
 import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.SoundProvider;
-import org.fbb.balkna.model.graphs.DataProvider;
 import org.fbb.balkna.model.primitives.Cycle;
 import org.fbb.balkna.model.primitives.Cycles;
 import org.fbb.balkna.model.primitives.ExerciseOverrides;
@@ -118,11 +114,12 @@ public class SettingsDialogue extends JDialog {
     private JComboBox mainTimerPositionV;
     private JLabel mainTimerPositionLabelH;
     private JComboBox mainTimerPositionH;
-    private JCheckBox saveStats;
     private JCheckBox exCheck;
     private JCheckBox trCheck;
     private JCheckBox cycCheck;
+    private JCheckBox saveStats;
     private JCheckBox playLongTermSounds;
+    private JCheckBox inhibitSleepAndroid;
     private JButton exDel;
     private JButton trDel;
     private JButton cycDel;
@@ -206,6 +203,7 @@ public class SettingsDialogue extends JDialog {
         mute.setSelected(!Model.getModel().isLaud());
         invertScreenLayout.setSelected(Settings.getSettings().isInvertScreenCompress());
         alowScreenChange.setSelected(Settings.getSettings().isAllowScreenChange());
+        inhibitSleepAndroid.setSelected(Settings.getSettings().isSleepInhibited());
         ratioCheckbox.setSelected(Model.getModel().isRatioForced());
         playLongTermSounds.setSelected(Settings.getSettings().isPlayLongTermSounds());
         this.pack();
@@ -368,7 +366,14 @@ public class SettingsDialogue extends JDialog {
                 Settings.getSettings().setAllowScreenChange(alowScreenChange.isSelected());
             }
         });
+        inhibitSleepAndroid.addActionListener(new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                Settings.getSettings().setSleepInhibited(inhibitSleepAndroid.isSelected());
+            }
+        });
         appearence.add(alowScreenChange);
+        appearence.add(inhibitSleepAndroid);
 
         soundPackLabel.setText("Soundpack:");
         settings.add(soundPackLabel);
@@ -854,6 +859,7 @@ public class SettingsDialogue extends JDialog {
         restsModLabel.setText("  - " + SwingTranslator.R("RestTimesModifier"));
         saveForOfline.setText(SwingTranslator.R("SaveForOfline"));
         alowScreenChange.setText(SwingTranslator.R("alowScreenChange"));
+        inhibitSleepAndroid.setText(SwingTranslator.R("inhibitSleepAndroid"));
         invertScreenLayout.setText(SwingTranslator.R("invertScreenLayout"));
 
         resetButton.setText(SwingTranslator.R("resetButton"));
@@ -910,6 +916,7 @@ public class SettingsDialogue extends JDialog {
         pauseOnExercise = new javax.swing.JCheckBox();
         pauseOnChange = new javax.swing.JCheckBox();
         alowScreenChange = new javax.swing.JCheckBox();
+        inhibitSleepAndroid = new javax.swing.JCheckBox();
         invertScreenLayout = new javax.swing.JCheckBox();
         cheaterLabel = new javax.swing.JLabel();
         allowSkipping = new javax.swing.JCheckBox();
