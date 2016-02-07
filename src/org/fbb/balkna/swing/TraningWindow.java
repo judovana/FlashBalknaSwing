@@ -53,7 +53,7 @@ public class TraningWindow extends javax.swing.JDialog {
     private final Cycle src2;
 
     TraningWindow(JFrame parent, boolean modal, MainTimer mainTimer, final Training src, final Cycle src2) {
-        super(parent, StatisticHelper.generateMessage(src2, src, (Exercise)null), modal);
+        super(parent, StatisticHelper.generateMessage(src2, src, (Exercise) null), modal);
         this.src = src;
         this.src2 = src2;
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -134,7 +134,7 @@ public class TraningWindow extends javax.swing.JDialog {
                 BasicTime time = model.getCurrent();
                 Exercise currentExercise = time.getOriginator().getOriginal();
                 if (model.isEnded()) {
-                        currentExercise.getStatsHelper().finished(StatisticHelper.generateMessage(src2, src, model));
+                    currentExercise.getStatsHelper().finished(StatisticHelper.generateMessage(src2, src, model));
                     if (model.wasSkipped()) {
                         src.getStatsHelper().finishedWithSkips(StatisticHelper.generateMessage(src2, src, model));
                     } else {
@@ -570,11 +570,18 @@ public class TraningWindow extends javax.swing.JDialog {
     final void setLocales() {
         skipButton.setText(SwingTranslator.R("skipForward"));
         backButton.setText(SwingTranslator.R("jumpBack"));
-        this.setTitle(src.getName());
+        this.setTitleX();
         // not localised because of logic
         //startButton.setText(SwingTranslator.R("Start"));
         validate();
         repaint();
+    }
+
+    public void setTitleX() {
+        this.setTitle(src.getName());
+        if (src2 instanceof Cycle) {
+            this.setTitle(src2.getName() + " (" + src2.getTrainingPointerToString() + ") - " + src.getName());
+        }
     }
 
     private void setTimerFont(int nvalue) {
