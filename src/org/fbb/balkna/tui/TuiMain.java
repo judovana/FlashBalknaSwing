@@ -10,7 +10,6 @@ import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.model.primitives.Training;
 import static org.fbb.balkna.swing.FlashBoulderBalkna.configDir;
-import org.fbb.balkna.model.utils.JavaPluginProvider;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.judovana.linux.ConsoleImageViewer;
 import static org.judovana.linux.ConsoleImageViewer.haveParam;

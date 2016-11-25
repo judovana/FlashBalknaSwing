@@ -20,7 +20,6 @@ import org.fbb.balkna.model.primitives.Exercise;
 import org.fbb.balkna.model.primitives.Training;
 import org.fbb.balkna.model.primitives.history.StatisticHelper;
 import org.fbb.balkna.model.utils.TimeUtils;
-import org.fbb.balkna.swing.TraningWindow;
 import org.fbb.balkna.swing.locales.SwingTranslator;
 import org.judovana.linux.ConsoleImageViewer;
 

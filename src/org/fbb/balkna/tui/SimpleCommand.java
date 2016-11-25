@@ -40,9 +40,9 @@ public class SimpleCommand {
             System.out.println(r.getSource().getResolution());
             for (PluginlistProvider.ParsedLine plugin : r.getResult()) {
                 System.out.println(plugin.getDescription());
-                System.out.println(Translator.R("PPstate") + ": " + plugin.getState().getResolution());
-                System.out.println(Translator.R("PPhomePage") + ": " + plugin.getHomePage());
-                System.out.println(Translator.R("PPlink") + ": " + plugin.getUrl());
+                System.out.println(SwingTranslator.R("PPstate") + ": " + plugin.getState().getResolution());
+                System.out.println(SwingTranslator.R("PPhomePage") + ": " + plugin.getHomePage());
+                System.out.println(SwingTranslator.R("PPlink") + ": " + plugin.getUrl());
             }
         }
         if (s.toLowerCase().startsWith("statistics")) {
