@@ -64,6 +64,7 @@ public class Commander {
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands6", configDir));
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands5"));
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands102"));
+        System.out.println(" * " + SwingTranslator.R("TuiMainCommands103"));
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands101"));
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands4"));
         System.out.println(" * " + SwingTranslator.R("TuiMainCommands3"));

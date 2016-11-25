@@ -20,6 +20,7 @@ import org.fbb.balkna.model.Trainable;
 import org.fbb.balkna.model.Translator;
 import org.fbb.balkna.model.primitives.history.Record;
 import org.fbb.balkna.model.primitives.history.RecordWithOrigin;
+import org.fbb.balkna.model.settings.PluginlistProvider;
 import org.fbb.balkna.model.settings.Settings;
 import org.fbb.balkna.swing.FlashBoulderBalkna;
 import org.fbb.balkna.swing.locales.SwingTranslator;
@@ -34,6 +35,16 @@ public class SimpleCommand {
 
     static void proceed(String s, List<Trainable> l) throws IOException {
 
+        if (s.toLowerCase().startsWith("known-plugins")) {
+            PluginlistProvider.LoadedPlugins r = PluginlistProvider.obtain();
+            System.out.println(r.getSource().getResolution());
+            for (PluginlistProvider.ParsedLine plugin : r.getResult()) {
+                System.out.println(plugin.getDescription());
+                System.out.println(Translator.R("PPstate") + ": " + plugin.getState().getResolution());
+                System.out.println(Translator.R("PPhomePage") + ": " + plugin.getHomePage());
+                System.out.println(Translator.R("PPlink") + ": " + plugin.getUrl());
+            }
+        }
         if (s.toLowerCase().startsWith("statistics")) {
             List<RecordWithOrigin> sl;
             String[] isOpt = s.split("\\s+");
