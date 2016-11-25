@@ -56,7 +56,7 @@ import org.fbb.balkna.swing.locales.SwingTranslator;
  * @author jvanek
  */
 public class SettingsDialogue extends JDialog {
-
+    
     private javax.swing.JCheckBox allowSkipping;
     private javax.swing.JSpinner auitoiterateSpinner;
     private javax.swing.JLabel autoIterateLabel;
@@ -93,12 +93,12 @@ public class SettingsDialogue extends JDialog {
     private javax.swing.JLabel trainingsModLabel;
     private javax.swing.JSpinner trainingsSpinner;
     private javax.swing.JLabel tutorialLabel;
-
+    
     private javax.swing.JTabbedPane bothPannels;
     private javax.swing.JPanel settings;
     private javax.swing.JPanel appearence;
     private javax.swing.JPanel stats;
-
+    
     private JLabel colorsInfo;
     private JLabel trainingDelimiterSizeLabel;
     private JSpinner trainingDelimiterSize;
@@ -123,71 +123,72 @@ public class SettingsDialogue extends JDialog {
     private JButton exDel;
     private JButton trDel;
     private JButton cycDel;
+    private JButton knownPlugins;
     private JList<RecordWithOrigin> statisticList;
     private JLabel singleExerciseOverrideLabel;
     private JTextField singleExerciseOverride;
     private JLabel singleExerciseParsed;
     private JCheckBox messages;
-
+    
     private final Training src1;
     private final Cycle src2;
-
+    
     public SettingsDialogue(final Training src1, Cycle src2) {
         this.src1 = src1;
         this.src2 = src2;
         this.setModal(true);
         init();
-
+        
         jTextField1.setText(Model.getModel().getExamplePluginUrl());
         auitoiterateSpinner.setModel(new SpinnerNumberModel(Model.getModel().getImagesOnTimerSpeed(), 0, 1000, 1));
         trainingsSpinner.setModel(new SpinnerNumberModel(Model.getModel().getTimeShift().getTraining(), 0d, 1000d, 0.05d));
         pausesSpinner.setModel(new SpinnerNumberModel(Model.getModel().getTimeShift().getPause(), 0d, 1000d, 0.05d));
         restsSpinner.setModel(new SpinnerNumberModel(Model.getModel().getTimeShift().getRest(), 0d, 1000d, 0.05d));
         iterationsSpinner.setModel(new SpinnerNumberModel(Model.getModel().getTimeShift().getIterations(), 0d, 1000d, 0.05d));
-
+        
         auitoiterateSpinner.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Model.getModel().setImagesOnTimerSpeed((Integer) ((JSpinner) e.getSource()).getValue());
             }
         });
-
+        
         trainingsSpinner.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Model.getModel().getTimeShift().setTraining((Double) ((JSpinner) e.getSource()).getValue());
             }
         });
-
+        
         pausesSpinner.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Model.getModel().getTimeShift().setPause((Double) ((JSpinner) e.getSource()).getValue());
             }
         });
         restsSpinner.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Model.getModel().getTimeShift().setRest((Double) ((JSpinner) e.getSource()).getValue());
             }
         });
-
+        
         iterationsSpinner.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Model.getModel().getTimeShift().setIterations((Double) ((JSpinner) e.getSource()).getValue());
             }
         });
-
+        
         prepare();
         setLocales();
     }
-
+    
     private void prepare() {
         jComboBox1.setModel(new DefaultComboBoxModel(Packages.SOUND_PACKS()));
         jComboBox1.setSelectedItem(SoundProvider.getInstance().getUsedSoundPack());
@@ -196,7 +197,7 @@ public class SettingsDialogue extends JDialog {
         } else {
             exportButton.setEnabled(true);
         }
-
+        
         allowSkipping.setSelected(Model.getModel().isAllowSkipping());
         pauseOnChange.setSelected(Model.getModel().isPauseOnChange());
         pauseOnExercise.setSelected(Model.getModel().isPauseOnExercise());
@@ -207,19 +208,19 @@ public class SettingsDialogue extends JDialog {
         ratioCheckbox.setSelected(Model.getModel().isRatioForced());
         playLongTermSounds.setSelected(Settings.getSettings().isPlayLongTermSounds());
         this.pack();
-
+        
     }
-
+    
     public final void init() {
         consts();
-
+        
         settings.setLayout(new java.awt.GridLayout(0, 1));
         appearence.setLayout(new java.awt.GridLayout(0, 1));
-
+        
         bothPannels.add(settings);
         bothPannels.add(appearence);
         bothPannels.add(stats);
-
+        
         reloadStats();
         stats.setLayout(new BorderLayout());
         JScrollPane jsp = new JScrollPane(statisticList);
@@ -227,7 +228,7 @@ public class SettingsDialogue extends JDialog {
         JPanel jpp = new JPanel(new GridLayout(2, 4));
         stats.add(jpp, BorderLayout.SOUTH);
         ActionListener al = new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 reloadStats();
@@ -241,16 +242,16 @@ public class SettingsDialogue extends JDialog {
         jpp.add(cycCheck);
         JButton nextButton = new JButton(SwingTranslator.R("Next"));
         nextButton.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(null, "Nearly done! Will be in next update!");
             }
         });
         jpp.add(nextButton);
-
+        
         messages.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 Record.SHOW_MESSAGE = messages.isSelected();
@@ -261,14 +262,14 @@ public class SettingsDialogue extends JDialog {
                 }
             }
         });
-
+        
         jpp.add(exDel);
         jpp.add(trDel);
         jpp.add(cycDel);
         jpp.add(messages);
-
+        
         exDel.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 File[] ff = Exercises.getStatsDir().listFiles();
@@ -279,7 +280,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         trDel.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 File[] ff = Trainings.getStatsDir().listFiles();
@@ -289,9 +290,9 @@ public class SettingsDialogue extends JDialog {
                 reloadStats();
             }
         });
-
+        
         cycDel.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 File[] ff = Cycles.getStatsDir().listFiles();
@@ -304,37 +305,37 @@ public class SettingsDialogue extends JDialog {
                 }
             }
         });
-
+        
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(bothPannels, BorderLayout.CENTER);
-
+        
         JPanel sharedButtons = new JPanel();
         sharedButtons.setLayout(new java.awt.GridLayout(0, 1));
         this.getContentPane().add(sharedButtons, BorderLayout.SOUTH);
-
+        
         ratioCheckbox.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 ratioCheckboxActionPerformed(e);
             }
         });
         appearence.add(ratioCheckbox);
-
+        
         autoIterateLabel.setText("autoiterate images on timer with speed (s): (0 disabled)");
         appearence.add(autoIterateLabel);
         appearence.add(auitoiterateSpinner);
-
+        
         saveStats.setSelected(Model.getModel().isSaveStats());
         settings.add(saveStats);
         saveStats.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent ae) {
                 Model.getModel().setSaveStats(saveStats.isSelected());
             }
         });
-
+        
         mute.setText("mute");
         mute.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -343,7 +344,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(mute);
-
+        
         playLongTermSounds.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -351,7 +352,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(playLongTermSounds);
-
+        
         invertScreenLayout.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -359,7 +360,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         appearence.add(invertScreenLayout);
-
+        
         alowScreenChange.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -374,12 +375,12 @@ public class SettingsDialogue extends JDialog {
         });
         appearence.add(alowScreenChange);
         appearence.add(inhibitSleepAndroid);
-
+        
         soundPackLabel.setText("Soundpack:");
         settings.add(soundPackLabel);
-
+        
         settings.add(jComboBox1);
-
+        
         testSoundsButton.setText("Test");
         testSoundsButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -388,7 +389,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(testSoundsButton);
-
+        
         setSoundPackButton.setText("Set soundpack");
         setSoundPackButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -397,13 +398,13 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(setSoundPackButton);
-
+        
         languageLabel.setText("Language");
         appearence.add(languageLabel);
-
+        
         jComboBox2.setModel(new javax.swing.DefaultComboBoxModel(Packages.LANGUAGES));
         appearence.add(jComboBox2);
-
+        
         changeLanguageButton.setText("Change trainings language");
         changeLanguageButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -412,10 +413,10 @@ public class SettingsDialogue extends JDialog {
             }
         });
         appearence.add(changeLanguageButton);
-
+        
         tutorialLabel.setText("--  Tutorial mode settings --");
         settings.add(tutorialLabel);
-
+        
         pauseOnExercise.setText("pause on each new exercise");
         pauseOnExercise.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -424,7 +425,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(pauseOnExercise);
-
+        
         pauseOnChange.setText("pause on each new serie");
         pauseOnChange.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -433,10 +434,10 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(pauseOnChange);
-
+        
         cheaterLabel.setText("-- Cheater settings --");
         settings.add(cheaterLabel);
-
+        
         allowSkipping.setText("allow skipping");
         allowSkipping.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -445,11 +446,11 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(allowSkipping);
-
+        
         creditsLabel.setText("-- app by judovana --");
         sharedButtons.add(creditsLabel);
         creditsLabel.addMouseListener(new MouseAdapter() {
-
+            
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (Desktop.isDesktopSupported()) {
@@ -460,9 +461,9 @@ public class SettingsDialogue extends JDialog {
                     }
                 }
             }
-
+            
         });
-
+        
         closeButton.setText("Close");
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -471,7 +472,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         sharedButtons.add(closeButton, BorderLayout.SOUTH);
-
+        
         resetButton.setText("Reset");
         resetButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -480,7 +481,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         sharedButtons.add(resetButton, BorderLayout.SOUTH);
-
+        
         exportButton.setText("Export current training to Html");
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -489,7 +490,7 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(exportButton);
-
+        
         downloadButton.setText("Download following jar as trainings");
         downloadButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -498,14 +499,14 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(downloadButton);
-
+        
         jTextField1.setText("file://");
         settings.add(jTextField1);
-
+        
         saveForOfline.setSelected(true);
         saveForOfline.setText("save for offline usage");
         settings.add(saveForOfline);
-
+        
         managePluginsButton.setText("Manage plugins");
         managePluginsButton.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -515,7 +516,7 @@ public class SettingsDialogue extends JDialog {
         });
         settings.add(managePluginsButton);
         localPlugin.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -530,26 +531,41 @@ public class SettingsDialogue extends JDialog {
             }
         });
         settings.add(localPlugin);
-
+        knownPlugins.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final KnownPlugins kp = new KnownPlugins();
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        kp.setMaster(SettingsDialogue.this);
+                        kp.setModal(true);
+                        kp.setVisible(true);
+                    }
+                });
+            }
+        });
+        settings.add(knownPlugins);
+        
         settings.add(singleExerciseOverrideLabel);
         settings.add(singleExerciseOverride);
         singleExerciseOverride.getDocument().addDocumentListener(new DocumentListener() {
-
+            
             @Override
             public void insertUpdate(DocumentEvent e) {
                 act();
             }
-
+            
             @Override
             public void removeUpdate(DocumentEvent e) {
                 act();
             }
-
+            
             @Override
             public void changedUpdate(DocumentEvent e) {
                 act();
             }
-
+            
             private void act() {
                 Settings.getSettings().setSingleExerciseOverride(singleExerciseOverride.getText());
                 singleExerciseParsed.setText(ExerciseOverrides.fakeFromString(Settings.getSettings().getSingleExerciseOverride()).format());
@@ -557,32 +573,32 @@ public class SettingsDialogue extends JDialog {
         });
         singleExerciseOverride.setText(Settings.getSettings().getSingleExerciseOverride());
         settings.add(singleExerciseParsed);
-
+        
         exercisesModLabel.setText("Exercise modifiers:");
         settings.add(exercisesModLabel);
-
+        
         trainingsModLabel.setText("  - Training times modifier:");
         settings.add(trainingsModLabel);
         settings.add(trainingsSpinner);
-
+        
         pausesModLabel.setText("  - Pause times modifier:");
         settings.add(pausesModLabel);
         settings.add(pausesSpinner);
-
+        
         restsModLabel.setText("  - Rest times modifier:");
         settings.add(restsModLabel);
         settings.add(restsSpinner);
-
+        
         iterationsModLabel.setText("  - Iterations modifier");
         settings.add(iterationsModLabel);
         settings.add(iterationsSpinner);
-
+        
         appearence.add(colorsInfo);
         appearence.add(trainingDelimiterSizeLabel);
         appearence.add(trainingDelimiterSize);
         trainingDelimiterSize.setValue(Settings.getSettings().getTrainingDelimiterSize());
         trainingDelimiterSize.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 Settings.getSettings().setTrainingDelimiterSize((Integer) ((JSpinner) e.getSource()).getValue());
@@ -609,7 +625,7 @@ public class SettingsDialogue extends JDialog {
                 }
                 colorPreview(trainingDelimiterColor, Settings.getSettings().getTrainingDelimiterColor());
             }
-
+            
         });
         appearence.add(selectedItemColorLabel);
         appearence.add(selectedItemColor);
@@ -632,13 +648,13 @@ public class SettingsDialogue extends JDialog {
                 }
                 colorPreview(selectedItemColor, Settings.getSettings().getSelectedItemColor());
             }
-
+            
         });
         appearence.add(mainTimerSizeLabel);
         appearence.add(mainTimerSize);
         mainTimerSize.setValue(Settings.getSettings().getMainTimerSize());
         mainTimerSize.addChangeListener(new ChangeListener() {
-
+            
             @Override
             public void stateChanged(ChangeEvent e) {
                 int nvalue = (Integer) ((JSpinner) e.getSource()).getValue();
@@ -672,13 +688,13 @@ public class SettingsDialogue extends JDialog {
                     TraningWindow.hack.setTimerFont();
                 }
             }
-
+            
         });
         appearence.add(mainTimerPositionLabelV);
         mainTimerPositionV.setModel(new DefaultComboBoxModel(Settings.VPOSITIONS));
         mainTimerPositionV.setSelectedItem(Settings.getSettings().getMainTimerPositionV());
         mainTimerPositionV.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 Settings.getSettings().setMainTimerPositionV(mainTimerPositionV.getSelectedItem().toString());
@@ -692,7 +708,7 @@ public class SettingsDialogue extends JDialog {
         mainTimerPositionH.setModel(new DefaultComboBoxModel(Settings.HPOSITIONS));
         mainTimerPositionH.setSelectedItem(Settings.getSettings().getMainTimerPositionH());
         mainTimerPositionH.addActionListener(new ActionListener() {
-
+            
             @Override
             public void actionPerformed(ActionEvent e) {
                 Settings.getSettings().setMainTimerPositionH(mainTimerPositionH.getSelectedItem().toString());
@@ -703,7 +719,7 @@ public class SettingsDialogue extends JDialog {
         });
         appearence.add(mainTimerPositionH);
     }
-
+    
     private void colorPreview(JLabel label, Integer value) {
         if (value != null) {
             label.setBackground(new Color(value));
@@ -713,22 +729,22 @@ public class SettingsDialogue extends JDialog {
             label.setBackground(label.getParent().getBackground());
         }
     }
-
+    
     private void closeButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().save();
         this.setVisible(false);
     }
-
+    
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().resetDefaults();
         this.setVisible(false);
     }
-
+    
     private void muteActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         Model.getModel().setLaud(!mute.isSelected());
     }
-
+    
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         try {
@@ -748,38 +764,38 @@ public class SettingsDialogue extends JDialog {
             ex.printStackTrace();
         }
     }
-
+    
     private void downloadButtonActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             Model.getModel().reload(saveForOfline.isSelected(), new URL(jTextField1.getText()));
             FlashBoulderBalkna.hack.reloadTrainings();
-
+            
         } catch (Exception ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, ex);
         }
     }
-
+    
     private void testSoundsButtonActionPerformed(java.awt.event.ActionEvent evt) {
         SoundProvider.getInstance().test(jComboBox1.getSelectedItem().toString());                // TODO add your handling code here:
     }
-
+    
     private void ratioCheckboxActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().setRatioForced(((JCheckBox) evt.getSource()).isSelected());
     }
-
+    
     private void pauseOnExerciseActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().setPauseOnExercise(((JCheckBox) evt.getSource()).isSelected());
     }
-
+    
     private void pauseOnChangeActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().setPauseOnChange(((JCheckBox) evt.getSource()).isSelected());
     }
-
+    
     private void allowSkippingActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().setAllowSkipping(((JCheckBox) evt.getSource()).isSelected());
     }
-
+    
     private void changeLanguageButtonActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             Model.getModel().setLanguage((String) jComboBox2.getSelectedItem());
@@ -794,11 +810,11 @@ public class SettingsDialogue extends JDialog {
             JOptionPane.showMessageDialog(this, ex);
         }
     }
-
+    
     private void setSoundPackButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Model.getModel().setSoundPack(jComboBox1.getSelectedItem().toString());
     }
-
+    
     private void managePluginsButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (Model.getModel().getPluginsDir().exists() && Model.getModel().getPluginsDir().list().length > 0) {
             final JDialog d = new JDialog(this, true);
@@ -810,7 +826,7 @@ public class SettingsDialogue extends JDialog {
             JButton b = new JButton(SwingTranslator.R("DeletePlugin"));
             d.add(b);
             b.addActionListener(new ActionListener() {
-
+                
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (l.getSelectedValue() != null) {
@@ -827,7 +843,7 @@ public class SettingsDialogue extends JDialog {
             JOptionPane.showMessageDialog(null, "No plugins");
         }
     }
-
+    
     private void setLocales() {
         mute.setText(SwingTranslator.R("mute"));
         saveStats.setText(SwingTranslator.R("saveStats"));
@@ -861,13 +877,13 @@ public class SettingsDialogue extends JDialog {
         alowScreenChange.setText(SwingTranslator.R("alowScreenChange"));
         inhibitSleepAndroid.setText(SwingTranslator.R("inhibitSleepAndroid"));
         invertScreenLayout.setText(SwingTranslator.R("invertScreenLayout"));
-
+        
         resetButton.setText(SwingTranslator.R("resetButton"));
-
+        
         bothPannels.setTitleAt(0, SwingTranslator.R("settingsTab"));
         bothPannels.setTitleAt(1, SwingTranslator.R("appearenceTab"));
         bothPannels.setTitleAt(2, SwingTranslator.R("statsTab"));
-
+        
         colorsInfo.setText(SwingTranslator.R("colorsInfo"));
         trainingDelimiterSizeLabel.setText(SwingTranslator.R("trainingDelimiterSizeLabel"));
         trainingDelimiterColorLabel.setText(SwingTranslator.R("trainingDelimiterColorLabel"));
@@ -876,11 +892,11 @@ public class SettingsDialogue extends JDialog {
         mainTimerColorLabel.setText(SwingTranslator.R("mainTimerColorLabel"));
         mainTimerPositionLabelV.setText(SwingTranslator.R("mainTimerPositionLabelV"));
         mainTimerPositionLabelH.setText(SwingTranslator.R("mainTimerPositionLabelH"));
-
+        
         trainingDelimiterColor.setOpaque(true);
         selectedItemColor.setOpaque(true);
         mainTimerColor.setOpaque(true);
-
+        
         exCheck.setText(SwingTranslator.R("mainTabExercise"));
         trCheck.setText(SwingTranslator.R("mainTabTrainings"));
         cycCheck.setText(SwingTranslator.R("mainTabCycles"));
@@ -888,19 +904,20 @@ public class SettingsDialogue extends JDialog {
         trDel.setText(SwingTranslator.R("delete"));
         cycDel.setText(SwingTranslator.R("delete"));
         playLongTermSounds.setText(SwingTranslator.R("playLongTermSounds"));
-
+        
         messages.setText(SwingTranslator.R("messages"));
-
+        
         singleExerciseOverrideLabel.setText(SwingTranslator.R("singleTrainingOverride"));;
-
+        knownPlugins.setText(SwingTranslator.R("PPkp"));
+        
         pack();
     }
-
+    
     private void consts() {
-
+        
         closeButton = new javax.swing.JButton();
         resetButton = new javax.swing.JButton();
-
+        
         ratioCheckbox = new javax.swing.JCheckBox();
         autoIterateLabel = new javax.swing.JLabel();
         auitoiterateSpinner = new javax.swing.JSpinner();
@@ -936,14 +953,14 @@ public class SettingsDialogue extends JDialog {
         restsSpinner = new javax.swing.JSpinner();
         iterationsModLabel = new javax.swing.JLabel();
         iterationsSpinner = new javax.swing.JSpinner();
-
+        
         bothPannels = new JTabbedPane();
-
+        
         settings = new JPanel();
         appearence = new JPanel();
         stats = new JPanel();
         statisticList = new JList();
-
+        
         colorsInfo = new JLabel();
         trainingDelimiterSizeLabel = new JLabel();
         trainingDelimiterSize = new JSpinner(new SpinnerNumberModel(0, 0, 1000, 1));
@@ -964,22 +981,23 @@ public class SettingsDialogue extends JDialog {
         trCheck = new JCheckBox("", true);
         exCheck = new JCheckBox("", false);
         playLongTermSounds = new JCheckBox();
-
+        
         cycDel = new JButton("");
         trDel = new JButton("");
         exDel = new JButton("");
-
+        knownPlugins = new JButton("");
+        
         singleExerciseOverride = new JTextField();
         singleExerciseOverrideLabel = new JLabel();
         singleExerciseParsed = new JLabel();
-
+        
         messages = new JCheckBox("", Record.SHOW_MESSAGE);
-
+        
     }
-
+    
     private void reloadStats() {
         statisticList.setModel(new AbstractListModel() {
-
+            
             List<RecordWithOrigin> data = Model.getModel().gatherStatistics(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected());
 //            BufferedImage b1 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getDayData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
 //            BufferedImage b6 = SwingGraph.generatePassFailGraph(DataProvider.getDataProvider().getHourData(exCheck.isSelected(), trCheck.isSelected(), cycCheck.isSelected()));
@@ -998,12 +1016,12 @@ public class SettingsDialogue extends JDialog {
             public int getSize() {
                 return data.size();
             }
-
+            
             @Override
             public Object getElementAt(int i) {
                 return data.get(i);
             }
-
+            
             private int getColumns() {
                 int columns = 0;
                 if (exCheck.isSelected()) {
@@ -1018,5 +1036,9 @@ public class SettingsDialogue extends JDialog {
                 return columns;
             }
         });
+    }
+    
+    void setPluginUrl(String string) {
+        jTextField1.setText(string);
     }
 }
