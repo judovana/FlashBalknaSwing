@@ -3,6 +3,8 @@ package org.fbb.balkna.swing;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -32,6 +34,30 @@ import org.fbb.balkna.tui.TuiMain;
  * @author jvanek
  */
 public class FlashBoulderBalkna extends javax.swing.JFrame {
+
+    private class ShowSettings implements Runnable {
+
+        public ShowSettings() {
+        }
+
+        @Override
+        public void run() {
+            TrainingWithCycle tc = getSelectedTraining();
+            Training t = null;
+            Cycle c = null;
+            if (tc != null) {
+                t = tc.t;
+                c = tc.c;
+            }
+            SettingsDialogue d = new SettingsDialogue(t, c);
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
+            d.setLocationRelativeTo(null);
+            d.setLocation(d.getLocation().x, ScreenFinder.getCurrentScreenSizeWithoutBounds().height-d.getHeight());
+            d.setVisible(true);
+            d.dispose();
+            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
+        }
+    }
 
     public static final File exportDir = new File(System.getProperty("user.home"));
     public static final File configDir = new File(System.getProperty("user.home") + "/.config/FlashBalkna");
@@ -116,25 +142,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             @Override
             public boolean dispatchKeyEvent(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_F1 && e.getID() == KeyEvent.KEY_PRESSED) {
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            TrainingWithCycle tc = getSelectedTraining();
-                            Training t = null;
-                            Cycle c = null;
-                            if (tc != null) {
-                                t = tc.t;
-                                c = tc.c;
-                            }
-                            SettingsDialogue d = new SettingsDialogue(t, c);
-                            KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
-                            d.setVisible(true);
-                            d.dispose();
-                            KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
-                        }
-                    });
-
+                    SwingUtilities.invokeLater(new ShowSettings());
                     return true;
                 }
                 return false;
@@ -172,8 +180,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         trainingForward = new javax.swing.JButton();
         panelWithInfo = new javax.swing.JPanel();
         imgPreview = new javax.swing.JPanel();
+        textPreviewPanel = new javax.swing.JPanel();
         textPreviewContainer = new javax.swing.JScrollPane();
         textPreview = new javax.swing.JTextArea();
+        settingsButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -270,13 +280,25 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         imgPreview.setLayout(new java.awt.BorderLayout());
         panelWithInfo.add(imgPreview);
 
+        textPreviewPanel.setLayout(new java.awt.BorderLayout());
+
         textPreview.setEditable(false);
         textPreview.setColumns(20);
         textPreview.setLineWrap(true);
         textPreview.setRows(5);
         textPreviewContainer.setViewportView(textPreview);
 
-        panelWithInfo.add(textPreviewContainer);
+        textPreviewPanel.add(textPreviewContainer, java.awt.BorderLayout.CENTER);
+
+        settingsButton.setText("III (F1)");
+        settingsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                settingsButtonActionPerformed(evt);
+            }
+        });
+        textPreviewPanel.add(settingsButton, java.awt.BorderLayout.PAGE_END);
+
+        panelWithInfo.add(textPreviewPanel);
 
         jPanel1.add(panelWithInfo);
 
@@ -358,6 +380,8 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             TraningWindow traningWindow = new TraningWindow(this, true, new MainTimer(l), t.t, t.c);
             t.t.getStatsHelper().started(StatisticHelper.generateMessage(t.c, t.t, (Exercise) null));
             deselect();
+            setIdealWindowSize(traningWindow);
+            traningWindow.setLocationRelativeTo(null);
             traningWindow.setVisible(true);
         }
     }//GEN-LAST:event_startTrainingButtonActionPerformed
@@ -377,7 +401,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         if (jTabbedPane1.getSelectedIndex() == 2) {
             panelWithInfo.removeAll();
             panelWithInfo.setLayout(new GridLayout(1, 1));
-            panelWithInfo.add(textPreviewContainer);
+            panelWithInfo.add(textPreviewPanel);
             panelWithInfo.validate();
             if (cyclesList.getModel().getSize() <= 0) {
                 JOptionPane.showMessageDialog(this, SwingTranslator.R("NoCyclesFound"));
@@ -386,7 +410,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             panelWithInfo.removeAll();
             panelWithInfo.setLayout(new GridLayout(2, 1));
             panelWithInfo.add(imgPreview);
-            panelWithInfo.add(textPreviewContainer);
+            panelWithInfo.add(textPreviewPanel);
             panelWithInfo.validate();
         }
     }//GEN-LAST:event_jTabbedPane1StateChanged
@@ -412,6 +436,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_trainingForwardActionPerformed
 
+    private void settingsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_settingsButtonActionPerformed
+        SwingUtilities.invokeLater(new ShowSettings());
+    }//GEN-LAST:event_settingsButtonActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -436,7 +464,10 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
                     @Override
                     public void run() {
                         try {
-                            new FlashBoulderBalkna().setVisible(true);
+                            FlashBoulderBalkna fbb = new FlashBoulderBalkna();
+                            setIdealWindowSize(fbb);
+                            fbb.setLocationRelativeTo(null);
+                            fbb.setVisible(true);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                             System.err.println(SwingTranslator.R("NoGui"));
@@ -459,6 +490,16 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
 
         }
     }
+
+    private static void setIdealWindowSize(Window b) {
+        Rectangle size = ScreenFinder.getCurrentScreenSizeWithoutBounds();
+        if (size.width > size.height) {
+            b.setSize(size.width / 2, (size.height * 9) / 10);
+        } else {
+            b.setSize(((size.width * 9) / 10), size.height / 2);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonsPanel;
     private javax.swing.JLabel currentTraining;
@@ -475,9 +516,11 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JPanel panelWithInfo;
     private javax.swing.JPanel pnelWithList;
+    private javax.swing.JButton settingsButton;
     private javax.swing.JButton startTrainingButton;
     private javax.swing.JTextArea textPreview;
     private javax.swing.JScrollPane textPreviewContainer;
+    private javax.swing.JPanel textPreviewPanel;
     private javax.swing.JButton trainingBack;
     private javax.swing.JButton trainingForward;
     private javax.swing.JList trainingsList;

@@ -242,7 +242,7 @@ public class TraningWindow extends javax.swing.JDialog {
                 if (!Settings.getSettings().isAllowScreenChange()) {
                     return;
                 }
-                if (evt.getButton() == MouseEvent.BUTTON3) {
+                if (evt.getButton() == MouseEvent.BUTTON3 || evt.getClickCount() > 1) {
                     ((BgLabel) timer).setSrcs(ip.getSrcs());
                     ((BgLabel) timer).setSelcted(ip.getSelcted());
                 }
