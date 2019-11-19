@@ -52,7 +52,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
             SettingsDialogue d = new SettingsDialogue(t, c);
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(f1);
             d.setLocationRelativeTo(null);
-            d.setLocation(d.getLocation().x, ScreenFinder.getCurrentScreenSizeWithoutBounds().height-d.getHeight());
+            d.setLocation(d.getLocation().x, ScreenFinder.getCurrentScreenSizeWithoutBounds().height - d.getHeight());
             d.setVisible(true);
             d.dispose();
             KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(f1);
@@ -444,7 +444,15 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public static void main(String args[]) throws IOException {
-        final boolean[] tui = new boolean[]{args.length > 0};
+        final boolean[] iconify = new boolean[]{false};
+        int argsToTui = 0;
+        for (String arg : args) {
+            if (arg.toLowerCase().contains("iconifyWindow".toLowerCase())) {
+                iconify[0] = true;
+                argsToTui = 1;
+            }
+        }
+        final boolean[] tui = new boolean[]{args.length > argsToTui};
         try {
             if (!tui[0]) {
                 try {
@@ -468,6 +476,9 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
                             setIdealWindowSize(fbb);
                             fbb.setLocationRelativeTo(null);
                             fbb.setVisible(true);
+                            if (iconify[0]) {
+                                fbb.setState(ICONIFIED);
+                            }
                         } catch (Exception ex) {
                             ex.printStackTrace();
                             System.err.println(SwingTranslator.R("NoGui"));
