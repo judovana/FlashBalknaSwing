@@ -155,14 +155,22 @@ public class ImgUtils {
         }
     }
 
+    public static List<BufferedImage> getTrainingImages(Exportable t) {
+        return getTrainingImages(t, 0, 0, false);
+    }
+
     public static List<BufferedImage> getTrainingImages(Exportable t, int targetW, int targetH) {
+        return getTrainingImages(t, targetW, targetH, true);
+    }
+
+    private static List<BufferedImage> getTrainingImages(Exportable t, int targetW, int targetH, boolean allImage) {
         List<BufferedImage> r = getImages(Packages.IMAGES_TRA, t.getImages());
         List<BufferedImage> r2 = getImages(Packages.IMAGES_EXE, t.getExerciseImages());
         if (r == null) {
             r = new ArrayList<BufferedImage>();
         }
         r.add(0, getDefaultImage());
-        if (r2.size() > 1) {
+        if (allImage && r2.size() > 1) {
             r.add(createAllImage(r2, targetW, targetH));
         }
         r.addAll(r2);
@@ -177,10 +185,8 @@ public class ImgUtils {
         }
         if (r.isEmpty()) {
             r.add(getDefaultImage());
-        } else {
-            if (r.size() > 1) {
-                r.add(0, createAllImage(r, targetW, targetH));
-            }
+        } else if (r.size() > 1) {
+            r.add(0, createAllImage(r, targetW, targetH));
         }
 
         return r;

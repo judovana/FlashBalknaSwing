@@ -483,7 +483,7 @@ public class FlashBoulderBalkna extends javax.swing.JFrame {
     private javax.swing.JList trainingsList;
     // End of variables declaration//GEN-END:variables
 
-    private String getSwingGuiStory() {
+    public static String getSwingGuiStory() {
         return "\n" + SwingTranslator.R("SwingInfoLine1")
                 + "\n" + SwingTranslator.R("SwingInfoLine2")
                 + "\n" + SwingTranslator.R("SwingInfoLine3")
