@@ -221,7 +221,6 @@ public class SettingsDialogue extends JDialog {
         ratioCheckbox.setSelected(Model.getModel().isRatioForced());
         playLongTermSounds.setSelected(Settings.getSettings().isPlayLongTermSounds());
         this.pack();
-
     }
 
     public final void init() {
@@ -932,6 +931,12 @@ public class SettingsDialogue extends JDialog {
         knownPlugins.setText(SwingTranslator.R("PPkp"));
 
         pack();
+        if (this.getWidth() > ScreenFinder.getCurrentScreenSizeWithoutBounds().width) {
+            this.setSize(ScreenFinder.getCurrentScreenSizeWithoutBounds().width-5, this.getHeight());
+        }
+        if (this.getHeight() > ScreenFinder.getCurrentScreenSizeWithoutBounds().height) {
+            this.setSize(this.getWidth(), ScreenFinder.getCurrentScreenSizeWithoutBounds().height-5);
+        }
     }
 
     private void consts() {

@@ -1,6 +1,7 @@
 package org.fbb.balkna.javax;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -12,11 +13,12 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import org.fbb.balkna.model.Model;
 import org.fbb.balkna.model.SoundProvider;
 import org.fbb.balkna.model.WavPlayer;
 import org.fbb.balkna.model.utils.IoUtils;
 
-public class WavPlayerImpl implements WavPlayer{
+public class WavPlayerImpl implements WavPlayer {
 
     private static final int BUFFER_SIZE = 128000;
     private final URL u;
@@ -47,7 +49,22 @@ public class WavPlayerImpl implements WavPlayer{
         InputStream is = null;
         try {
             is = u.openStream();
-            playSound(new BufferedInputStream(is));
+            try {
+                playSound(new BufferedInputStream(is));
+            } catch (LineUnavailableException ex) {
+                ex.printStackTrace();
+                System.err.println("play  fallback!");
+                File f = File.createTempFile("fbb", "veryTest");
+                File dir = f.getParentFile();
+                f.delete();
+                File ff = new File(u.getFile());
+                f = new File(dir, SoundProvider.getInstance().getUsedSoundPack() + "-" + ff.getName());
+                if (!f.exists()) {
+                    Model.saveUrl(u, f);
+                }
+                ProcessBuilder pb = new ProcessBuilder("play", f.getAbsolutePath());
+                Process p = pb.start();
+            }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
